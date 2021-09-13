@@ -1,0 +1,42 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class TestAnimations : MonoBehaviour
+{
+    public Animator PlayerAnimator;
+    public string KnockTriggerParam = "KnockedOff";
+    public Button KnockDownButton;
+    public Toggle PushingToggle;
+    public Slider SpeedSlider;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        PushingToggle.onValueChanged.AddListener((t) => { PlayerAnimator.SetBool("Pushing", t); });
+        KnockDownButton.onClick.AddListener(() => { StartCoroutine(KnockdownPlayer()); });
+        SpeedSlider.onValueChanged.AddListener((s) => { PlayerAnimator.SetFloat("Speed",s); });
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+
+    void SetPlayerSpeed()
+    {
+        
+    }
+
+    IEnumerator KnockdownPlayer()
+    {
+        PlayerAnimator.SetTrigger("KnockedOff");
+        yield return new WaitForSeconds(2);
+        PlayerAnimator.ResetTrigger("KnockedOff");
+        PlayerAnimator.Play("Pushing");
+    }
+
+}
