@@ -80,10 +80,10 @@ public class WheelColliderBoard : MonoBehaviour
         LeftFrontWheel.motorTorque = vertical * Torque;
         RightFrontWheel.steerAngle = FrontRotation;
         RightFrontWheel.motorTorque = vertical * Torque;
-        LeftRearWheel.steerAngle = RearRotation;
-        LeftRearWheel.motorTorque = vertical * Torque;
-        RightRearWheel.steerAngle = RearRotation;
-        RightRearWheel.motorTorque = vertical * Torque;
+        //LeftRearWheel.steerAngle = RearRotation;
+        //LeftRearWheel.motorTorque = vertical * Torque;
+        //RightRearWheel.steerAngle = RearRotation;
+        //RightRearWheel.motorTorque = vertical * Torque;
         Debug.Log($"{FrontRotation}, {RearRotation}");
         //if (vertical != 0)
         //{
