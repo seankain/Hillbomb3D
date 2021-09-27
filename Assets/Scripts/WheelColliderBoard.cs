@@ -19,12 +19,14 @@ public class WheelColliderBoard : MonoBehaviour
     public WheelCollider RightRearWheel;
     public float MaxTurnDegrees = 30f;
     public float TurnSpeed = 4;
-
+    private Vector3 OriginalPosition;
+   
 
     // Start is called before the first frame update
     void Start()
     {
         wcs = GetComponentsInChildren<WheelCollider>();
+        OriginalPosition = this.transform.position;
         //rb = GetComponent<Rigidbody>();
         //foreach(var wc in wcs)
         //{
@@ -37,6 +39,7 @@ public class WheelColliderBoard : MonoBehaviour
     {
         TurnAxels(Input.GetAxis("Horizontal"));
         vertical = Input.GetAxis("Vertical");
+        if(Input.GetAxis("Jump") > 0) { Respawn(); }
 
     }
 
@@ -80,10 +83,10 @@ public class WheelColliderBoard : MonoBehaviour
         LeftFrontWheel.motorTorque = vertical * Torque;
         RightFrontWheel.steerAngle = FrontRotation;
         RightFrontWheel.motorTorque = vertical * Torque;
-        //LeftRearWheel.steerAngle = RearRotation;
-        //LeftRearWheel.motorTorque = vertical * Torque;
-        //RightRearWheel.steerAngle = RearRotation;
-        //RightRearWheel.motorTorque = vertical * Torque;
+        LeftRearWheel.steerAngle = RearRotation;
+        LeftRearWheel.motorTorque = vertical * Torque;
+        RightRearWheel.steerAngle = RearRotation;
+        RightRearWheel.motorTorque = vertical * Torque;
         Debug.Log($"{FrontRotation}, {RearRotation}");
         //if (vertical != 0)
         //{
@@ -91,4 +94,11 @@ public class WheelColliderBoard : MonoBehaviour
         //    rb.AddForce(Vector3.forward * PushForce * Time.deltaTime);
         //}
     }
+
+    private void Respawn()
+    {
+        this.transform.position = OriginalPosition;
+        this.transform.rotation = Quaternion.identity;
+    }
+
 }

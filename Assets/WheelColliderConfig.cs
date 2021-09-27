@@ -112,9 +112,9 @@ public class WheelColliderConfig : MonoBehaviour
     void Start()
     {
         //All of the wheel colliders should be the same in this case
-        var wc = OverwrittenColliders[0];
-        radius = wc.radius;
-        mass = wc.mass;
+        //var wc = OverwrittenColliders[0];
+        //radius = wc.radius;
+        //mass = wc.mass;
 
        
 
