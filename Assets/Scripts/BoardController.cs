@@ -7,17 +7,36 @@ public class BoardController : MonoBehaviour
     public bool Grounded = false;
     public Vector3 LevelDirection = Vector3.forward;
     public Vector3 SurfaceAngleEuler = Vector3.zero;
-    public float ArbitraryConstant =1;
+    public float ArbitraryConstant = 1;
     private Vector3 OriginalPosition;
     private Vector3 SteerDirection = Vector3.forward;
     public float TurnForceConstant = 1;
+    public float MaxTurnTime = 3f;
+    public float PowerSlideSpeed = 10f;
+    public float MaxPushSpeed = 10f;
+    public float PushCooldown = 1.0f;
+    public Vector3 PushForce = new Vector3(0, 0, 10);
+    public GameObject Deck;
+    public float MaxLeanZ = 10f;
+    public float MaxLeanY = 10f;
+    public Animator SkateboardAnimator;
 
     private Rigidbody rb;
 
     const float radConvert = Mathf.PI / 180f;
+    // Approximated a skateboard rolling down a hill using a solid cylinder rolling down an angled plane
     const float downhillAcc = (2f / 3f) * 9.81f;
     private float horizontal = 0;
     private float vertical = 0;
+    private Vector3 powerSlideRotation = new Vector3(0, 90, 15);
+    private bool backsideSlide = false;
+    private bool frontsideSlide = false;
+    private bool isPowerSliding = false;
+    private float pushTimer = 0f;
+    private bool pushing = false;
+    //increments during turns to indicate how hard the player is trying to turn
+    private float turnTime = 0;
+
 
     // Start is called before the first frame update
     void Start()
@@ -31,18 +50,184 @@ public class BoardController : MonoBehaviour
     {
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
+        SkateboardAnimator.SetFloat("Turn", horizontal);
+        if (vertical > 0 && rb.velocity.magnitude < MaxPushSpeed)
+        {
+            pushing = true;
+        }
+        // Holding back on vertical and turning signals an intentional powerslide
+        if (vertical < 0 && horizontal !=0 && !isPowerSliding)
+        {
+  
+            backsideSlide = horizontal > 0;
+            frontsideSlide = horizontal < 0;
+            isPowerSliding = true;
+            if (backsideSlide)
+            {
+           
+                // StartCoroutine(Rotate(0.2f, 90f));
+                SkateboardAnimator.SetBool("BacksidePowerslide", true);
+
+            }
+            else if (frontsideSlide)
+            {   
+         
+                //   StartCoroutine(Rotate(0.2f, -90f));
+                SkateboardAnimator.SetBool("FrontsidePowerslide", true);
+            }
+
+        }
+        else if(vertical == 0)
+        {
+            //once player is powersliding, they can stop by letting go on vertical
+            if (isPowerSliding) 
+            {
+                isPowerSliding = false;
+                if (backsideSlide)
+                {
+                    //StartCoroutine(Rotate(0.2f, 0.1f));
+                    SkateboardAnimator.SetBool("BacksidePowerslide", false);
+                }
+                else if (frontsideSlide)
+                {
+                    //StartCoroutine(Rotate(0.2f, 0.1f, -90f));
+                    SkateboardAnimator.SetBool("FrontsidePowerslide", false);
+                }
+            }
+            if (horizontal != 0)
+            {
+                if (turnTime < MaxTurnTime)
+                {
+                    turnTime += Time.deltaTime;
+                }
+            }
+            else
+            {
+                turnTime = 0;
+                //StartCoroutine(UnLean(0, 0));
+            }
+
+        }
 
         if (Input.GetAxis("Jump") > 0) { Respawn(); }
+    }
+
+    private IEnumerator UnLean(float directionY,float directionZ,float duration = 0.1f)
+    {
+        var startLean = transform.rotation.eulerAngles;
+        var endLean = new Vector3(startLean.x,0,0);
+        float t = 0.0f;
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            //Debug.Log($"{t}/{duration} = {t/duration}");
+            var increment = Vector3.Lerp(startLean, endLean,t);
+            //float yRotation = Mathf.Lerp(startRotation, endRotation, t / duration);
+            transform.rotation = Quaternion.Euler(increment);
+            //Debug.Log($"{t/duration} {transform.rotation.eulerAngles}");
+            yield return null;
+        }
+    }
+
+    private IEnumerator Rotate(float duration,float rot, float originalRotation = Mathf.NegativeInfinity)
+    {
+        float startRotation = transform.eulerAngles.y;
+        if (originalRotation != Mathf.NegativeInfinity)
+        {
+            startRotation = originalRotation;
+        }
+        //float endRotation = startRotation + rot;
+        float endRotation = rot;
+        float t = 0.0f;
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            //Debug.Log($"{t}/{duration} = {t/duration}");
+            float yRotation = Mathf.Lerp(startRotation, endRotation, t / duration);
+            transform.rotation = Quaternion.Euler(transform.eulerAngles.x, yRotation, transform.eulerAngles.z);
+            //Debug.Log($"{t/duration} {transform.rotation.eulerAngles}");
+            yield return null;
+        }
+    }
+
+    private IEnumerator RotateReverse(float duration,float rot,float originalRotation=Mathf.NegativeInfinity)
+    {
+        float startRotation = transform.eulerAngles.y;
+        if (originalRotation != Mathf.NegativeInfinity)
+        {
+            startRotation = originalRotation;
+        }
+
+        Debug.Log(startRotation);
+        //float endRotation = startRotation + rot;
+        float endRotation = rot;
+        float t = duration;
+        while (t>0)
+        {
+            t -= Time.deltaTime;
+            //Debug.Log($"{t}/{duration} = {t/duration}");
+            float yRotation = Mathf.Lerp(startRotation, endRotation, t / duration);
+            transform.rotation = Quaternion.Euler(transform.eulerAngles.x, yRotation, transform.eulerAngles.z);
+            Debug.Log($"{t / duration} {transform.rotation.eulerAngles}");
+            yield return null;
+        }
+    }
+
+    private IEnumerator PowerSlide()
+    {
+        if (backsideSlide)
+        {
+            while (gameObject.transform.rotation.eulerAngles != powerSlideRotation)
+            {
+                gameObject.transform.rotation = Quaternion.Euler(Vector3.MoveTowards(gameObject.transform.rotation.eulerAngles, powerSlideRotation, PowerSlideSpeed * Time.deltaTime));
+                yield return null;
+            }
+        }
+        else if (frontsideSlide)
+        {
+            while (gameObject.transform.rotation.eulerAngles != powerSlideRotation)
+            {
+                gameObject.transform.rotation = Quaternion.Euler(Vector3.MoveTowards(gameObject.transform.rotation.eulerAngles, -powerSlideRotation, PowerSlideSpeed * Time.deltaTime));
+                yield return null;
+            }
+        }
+    }
+
+    private IEnumerator StopPowerSlide()
+    {
+        while (gameObject.transform.rotation.eulerAngles != Vector3.zero)
+        {
+            gameObject.transform.rotation = Quaternion.Euler(Vector3.MoveTowards(gameObject.transform.rotation.eulerAngles,Vector3.zero, PowerSlideSpeed * Time.deltaTime));
+            yield return null;
+        }
     }
 
     private void FixedUpdate()
     {
         var acc = ArbitraryConstant * (LevelDirection * (2f / 3f) * 9.8f * Mathf.Sin(radConvert * SurfaceAngleEuler.x));
-        var turnForce = TurnForceConstant * Vector3.right * horizontal;
+        // var turnForce = (TurnForceConstant * rb.velocity.magnitude + turnTime) * Vector3.right * horizontal;
+        var turnForce =  TurnForceConstant * Vector3.right * horizontal;
         //Debug.Log(acc);
         //Debug.Log(turnForce);
         //Debug.Log(Vector3.Cross(acc, turnForce));
-        rb.AddForce(turnForce,ForceMode.VelocityChange);
+        if (!isPowerSliding)
+        {
+            rb.AddForce(turnForce, ForceMode.Impulse);
+        }
+        if (pushing)
+        {
+            if(pushTimer == 0)
+            {
+                Debug.Log("pushing");
+                rb.AddForce(PushForce,ForceMode.VelocityChange);
+            }
+            pushTimer += Time.deltaTime;
+            if(pushTimer >= PushCooldown)
+            {
+                pushing = false;
+                pushTimer = 0;
+            }
+        }
         rb.AddForce(acc);
     }
 
@@ -52,8 +237,8 @@ public class BoardController : MonoBehaviour
         //var contacts = new ContactPoint[collision.contactCount];
         //collision.GetContacts(contacts);
         SurfaceAngleEuler = collision.gameObject.transform.rotation.eulerAngles;
-        
-        
+
+
     }
 
     private void Respawn()

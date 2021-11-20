@@ -87,7 +87,6 @@ public class WheelColliderBoard : MonoBehaviour
         LeftRearWheel.motorTorque = vertical * Torque;
         RightRearWheel.steerAngle = RearRotation;
         RightRearWheel.motorTorque = vertical * Torque;
-        Debug.Log($"{FrontRotation}, {RearRotation}");
         //if (vertical != 0)
         //{
         //    Debug.Log(vertical);

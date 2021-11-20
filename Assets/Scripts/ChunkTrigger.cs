@@ -51,7 +51,7 @@ public class ChunkTrigger : MonoBehaviour
         if (other.CompareTag("Player") && TriggerType == ChunkTriggerType.Entry)
         {
             OnChunkEntered(new ChunkTransitEventArgs());
-            Debug.Log($"Player entering chunk");
+            //Debug.Log($"Player entering chunk");
         }
     }
 
@@ -60,7 +60,7 @@ public class ChunkTrigger : MonoBehaviour
         if (other.CompareTag("Player") && TriggerType == ChunkTriggerType.Exit)
         {
             OnChunkExited(new ChunkTransitEventArgs());
-            Debug.Log($"Player exiting chunk");
+            //Debug.Log($"Player exiting chunk");
         }
     }
 }

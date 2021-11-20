@@ -49,7 +49,7 @@ public class ChunkCycler : MonoBehaviour
         var minChunkEnd = FindMinChunkEnd();
         var dist = chunk.ChunkStart.transform.position - minChunkEnd;
         chunk.transform.position = (chunk.transform.position - dist);
-        Debug.Log($"Moving {chunk.name} to  {chunk.transform.position}");
+        //Debug.Log($"Moving {chunk.name} to  {chunk.transform.position}");
         chunk.Passed = false;
         //WaterPlane.transform.position = new Vector3(WaterPlane.transform.position.x, minChunkEnd.y - WaterPlaneOffset, WaterPlane.transform.position.z);
         StartCoroutine(LowerWaterPlane());
@@ -67,7 +67,7 @@ public class ChunkCycler : MonoBehaviour
                 minChunk = c;
             }
         }
-        Debug.Log($"Min chunk is {minChunk.gameObject.name} at {min}");
+        //Debug.Log($"Min chunk is {minChunk.gameObject.name} at {min}");
         return min;
     }
 
