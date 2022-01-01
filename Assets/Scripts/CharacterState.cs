@@ -26,6 +26,11 @@ public class CharacterState : MonoBehaviour
         anim.SetFloat("Speed", rb.velocity.magnitude);
     }
 
+    public void Ollie()
+    {
+        anim.SetTrigger("Ollie");
+    }
+
     void OnAnimatorIK(int layerIndex)
     {
         if (!anim.GetBool("Pushing"))

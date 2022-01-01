@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,7 +21,7 @@ public class WheelColliderBoard : MonoBehaviour
     public float MaxTurnDegrees = 30f;
     public float TurnSpeed = 4;
     private Vector3 OriginalPosition;
-   
+    private bool ollieStarted = false;
 
     // Start is called before the first frame update
     void Start()
@@ -39,8 +40,18 @@ public class WheelColliderBoard : MonoBehaviour
     {
         TurnAxels(Input.GetAxis("Horizontal"));
         vertical = Input.GetAxis("Vertical");
-        if(Input.GetAxis("Jump") > 0) { Respawn(); }
+        var jump = Input.GetAxis("Jump");
+        if(jump > 0) { ollieStarted = true;  }
+        if (jump < 0 && ollieStarted) {
+            Ollie();
+        }
+        
 
+    }
+
+    private void Ollie()
+    {
+        throw new NotImplementedException();
     }
 
     private void TurnAxels(float turn)

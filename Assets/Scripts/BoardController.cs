@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,11 +16,15 @@ public class BoardController : MonoBehaviour
     public float PowerSlideSpeed = 10f;
     public float MaxPushSpeed = 10f;
     public float PushCooldown = 1.0f;
+    public Vector3 OlliePopForce = new Vector3(0, 10, 0);
     public Vector3 PushForce = new Vector3(0, 0, 10);
     public GameObject Deck;
     public float MaxLeanZ = 10f;
     public float MaxLeanY = 10f;
     public Animator SkateboardAnimator;
+
+    [SerializeField]
+    private CharacterState characterState;
 
     private Rigidbody rb;
 
@@ -36,6 +41,8 @@ public class BoardController : MonoBehaviour
     private bool pushing = false;
     //increments during turns to indicate how hard the player is trying to turn
     private float turnTime = 0;
+    private bool ollieStarted = false;
+    private float lastJump = 0;
 
 
     // Start is called before the first frame update
@@ -48,10 +55,26 @@ public class BoardController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(Input.GetAxis("Respawn") > 0)
+        {
+            Respawn();
+        }
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
+        var jump = Input.GetAxis("Jump");
+        if (jump > 0) { ollieStarted = true; }
+        if (jump < lastJump && ollieStarted && Grounded)
+        {
+            if(!isPowerSliding)
+            {
+                Ollie();
+            }
+
+        }
+        // Don't want a delay based on axis returning to zero
+        lastJump = jump;
         SkateboardAnimator.SetFloat("Turn", horizontal);
-        if (vertical > 0 && rb.velocity.magnitude < MaxPushSpeed)
+        if (Grounded && vertical > 0 && rb.velocity.magnitude < MaxPushSpeed)
         {
             pushing = true;
         }
@@ -109,7 +132,14 @@ public class BoardController : MonoBehaviour
 
         }
 
-        if (Input.GetAxis("Jump") > 0) { Respawn(); }
+      
+    }
+
+    private void Ollie()
+    {
+        characterState.Ollie();
+        SkateboardAnimator.SetTrigger("Ollie");
+        rb.AddForce(OlliePopForce);
     }
 
     private IEnumerator UnLean(float directionY,float directionZ,float duration = 0.1f)
@@ -206,13 +236,13 @@ public class BoardController : MonoBehaviour
     {
         var acc = ArbitraryConstant * (LevelDirection * (2f / 3f) * 9.8f * Mathf.Sin(radConvert * SurfaceAngleEuler.x));
         // var turnForce = (TurnForceConstant * rb.velocity.magnitude + turnTime) * Vector3.right * horizontal;
-        var turnForce =  TurnForceConstant * Vector3.right * horizontal;
+        var turnForce =  TurnForceConstant * rb.velocity.z * Vector3.right * horizontal;
         //Debug.Log(acc);
         //Debug.Log(turnForce);
         //Debug.Log(Vector3.Cross(acc, turnForce));
         if (!isPowerSliding)
         {
-            rb.AddForce(turnForce, ForceMode.Impulse);
+            rb.AddForce(turnForce, ForceMode.Force);
         }
         if (pushing)
         {
@@ -241,9 +271,17 @@ public class BoardController : MonoBehaviour
 
     }
 
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.tag == "RidingSurface") {
+            Grounded = false;
+        };
+    }
+
     private void Respawn()
     {
-        this.transform.position = OriginalPosition;
+        var respawn = GameObject.FindGameObjectsWithTag("Respawn")[0];
+        this.transform.position = respawn.transform.position;
         this.transform.rotation = Quaternion.identity;
         rb.velocity = Vector3.zero;
     }
