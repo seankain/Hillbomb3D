@@ -15,6 +15,7 @@ public class NpcVehicle : MonoBehaviour
     private bool[] wheelGroundedState;
     private WheelCollider[] wheelColliders;
     private Rigidbody rb;
+    private VehicleDriveState driveState;
 
     public float extremumSlip;
     public float extremumValue;
@@ -28,7 +29,7 @@ public class NpcVehicle : MonoBehaviour
     private float brake = 0;
     private float steering = 0;
     private GameObject[] waypoints;
-    private GameObject activeWaypoint;
+    private Waypoint activeWaypoint;
     private WheelHit[] wheelHits;
     public void Start()
     {
@@ -42,27 +43,41 @@ public class NpcVehicle : MonoBehaviour
 
     public void FixedUpdate()
     {
-        if (rb.velocity.magnitude < maxSpeedMetersPerSecond)
+        if (!gameObject.activeSelf) { return; }
+        if (driveState == VehicleDriveState.Driving)
         {
-            //Debug.Log($"Accelerating. Current motor torque {motor} newton meters. Steering angle {steering}");
-            if (motor < maxMotorTorque)
+            if (rb.velocity.magnitude < maxSpeedMetersPerSecond)
             {
-                motor += Acceleration;
+                //Debug.Log($"Accelerating. Current motor torque {motor} newton meters. Steering angle {steering}");
+                if (motor < maxMotorTorque)
+                {
+                    motor += Acceleration;
+                }
+                else
+                {
+                    motor = maxMotorTorque;
+                }
+                brake = 0;
             }
-            else
+            if (rb.velocity.magnitude > maxSpeedMetersPerSecond)
             {
-                motor = maxMotorTorque;
+                if (motor > 0)
+                {
+                    motor -= Acceleration;
+                }
+                brake += Acceleration;
+
             }
-            brake = 0;
         }
-        if(rb.velocity.magnitude > maxSpeedMetersPerSecond)
+        if (driveState == VehicleDriveState.Braking)
         {
-            if(motor > 0)
-            {
-                motor -= Acceleration;
-            }
-            brake += Acceleration;
-            
+            var dist = Vector3.Distance(gameObject.transform.position, activeWaypoint.transform.position);
+            var arrivalTime = dist / rb.velocity.magnitude;
+            brake = rb.mass * arrivalTime;
+        }
+        if(driveState == VehicleDriveState.Stopped)
+        {
+            return;
         }
         steering = GetNextSteeringAngle();
         foreach (AxleInfo axleInfo in axleInfos)
@@ -83,6 +98,8 @@ public class NpcVehicle : MonoBehaviour
                 axleInfo.rightWheel.brakeTorque = brake;
             }
         }
+
+
     }
 
     private float GetNextSteeringAngle()
@@ -92,7 +109,7 @@ public class NpcVehicle : MonoBehaviour
         return -Vector3.SignedAngle(targetDir, transform.forward, Vector3.up);
     }
 
-    private GameObject GetNextWayPoint()
+    private Waypoint GetNextWayPoint()
     {
 
         var closest = waypoints[0];
@@ -105,13 +122,14 @@ public class NpcVehicle : MonoBehaviour
                 closest = waypoints[i];
                 distance = curDistance;
             }
-           
+
         }
-        return closest;
+        return closest.GetComponent<Waypoint>();
     }
 
     public void Update()
     {
+        if (!gameObject.activeSelf) { return; }
         for (var i = 0; i < wheelColliders.Length; i++)
         {
             wheelColliders[i].forwardFriction = new WheelFrictionCurve
@@ -139,10 +157,47 @@ public class NpcVehicle : MonoBehaviour
     {
         if (other.gameObject.tag == "Waypoint")
         {
-            activeWaypoint = other.GetComponent<Waypoint>().NextWaypoint.gameObject;
+            var enteredWaypoint = other.GetComponent<Waypoint>();
+            // hitting intersecting waypoints
+            if(enteredWaypoint != activeWaypoint) { return; }
+            activeWaypoint = other.GetComponent<Waypoint>().NextWaypoints[Random.Range(0, enteredWaypoint.NextWaypoints.Count - 1)];
+            //Consider changing all waypoint game object references to actual waypoint now that it holds more information
+            var nextWayPoint = activeWaypoint.GetComponent<Waypoint>();
+            if (nextWayPoint.BoundTrafficLight != null && nextWayPoint.BoundTrafficLight.CurrentState == TrafficLightState.LightStop)
+            {
+                BrakeToStop();
+            }
             Debug.Log($"Passing {other.gameObject.name}, traveling to {activeWaypoint.gameObject.name}");
         }
+        //Leaving traffic, go back into pool
+        if (other.gameObject.tag == "NpcSink")
+        {
+            gameObject.SetActive(false);
+        }
     }
+
+    private void Stop()
+    {
+        driveState = VehicleDriveState.Stopped;
+    }
+
+    private void BrakeToStop()
+    {
+        driveState = VehicleDriveState.Braking;
+    }
+
+    private void Go()
+    {
+        driveState = VehicleDriveState.Driving;
+    }
+
+}
+
+public enum VehicleDriveState
+{
+    Driving,
+    Stopped,
+    Braking
 }
 
 

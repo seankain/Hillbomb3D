@@ -18,6 +18,11 @@ public class HillChunk : MonoBehaviour
     public ChunkTrigger EntryTrigger;
     public ChunkTrigger ExitTrigger;
 
+    public Waypoint InboundTopWaypoint;
+    public Waypoint InboundBottomWaypoint;
+    public Waypoint OutboundTopWaypoint;
+    public Waypoint OutboundBottomWaypoint;
+
     public event ChunkPassedEventHandler ChunkPassed;
 
     // Start is called before the first frame update
