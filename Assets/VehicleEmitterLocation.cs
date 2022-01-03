@@ -8,17 +8,15 @@ public class VehicleEmitterLocation : MonoBehaviour
     public VehicleEmitterDirection Direction;
     public Transform Enter;
     public Transform Exit;
+    public HillChunk ParentChunk;
 
     // Start is called before the first frame update
     void Start()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        if (ParentChunk == null)
+        {
+            ParentChunk = gameObject.GetComponentInParent<HillChunk>();
+        }
     }
 
     private void OnTriggerEnter(Collider other)

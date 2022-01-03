@@ -52,6 +52,7 @@ public class ChunkCycler : MonoBehaviour
         //Debug.Log($"Moving {chunk.name} to  {chunk.transform.position}");
         chunk.Passed = false;
         //WaterPlane.transform.position = new Vector3(WaterPlane.transform.position.x, minChunkEnd.y - WaterPlaneOffset, WaterPlane.transform.position.z);
+        MoveObstacles(chunk, dist);
         StartCoroutine(LowerWaterPlane());
     }
 
@@ -69,6 +70,18 @@ public class ChunkCycler : MonoBehaviour
         }
         //Debug.Log($"Min chunk is {minChunk.gameObject.name} at {min}");
         return min;
+    }
+
+    private void MoveObstacles(HillChunk chunk, Vector3 dist)
+    {
+        var npcVehicles = FindObjectsOfType<NpcVehicle>();
+        foreach(var npcVehicle in npcVehicles)
+        {
+            if(npcVehicle.CurrentChunk == chunk)
+            {
+                npcVehicle.transform.position -= dist;
+            }
+        }
     }
 
     IEnumerator LowerWaterPlane()

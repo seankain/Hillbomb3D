@@ -50,8 +50,23 @@ public class VehiclePrefabPool : MonoBehaviour
         {
             var prefab = Instantiate(VehiclePrefab, spawnPosition.Enter.position, spawnPosition.Enter.rotation, null);
             var vehicle = prefab.GetComponent<NpcVehicle>();
+            vehicle.CurrentChunk = spawnPosition.ParentChunk;
             prefab.GetComponent<MeshCycler>().SetRandomMesh();
             pool.Add(vehicle);
+        }
+        else
+        {
+            foreach(var p in pool)
+            {
+                if (!p.isActiveAndEnabled)
+                {
+                    p.gameObject.SetActive(true);
+                    p.gameObject.transform.position = spawnPosition.Enter.position;
+                    p.gameObject.transform.rotation = spawnPosition.Enter.rotation;
+                    p.CurrentChunk = spawnPosition.ParentChunk;
+                    p.GetComponent<MeshCycler>().SetRandomMesh();
+                }
+            }
         }
     }
 

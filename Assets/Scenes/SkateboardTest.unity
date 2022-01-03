@@ -4980,7 +4980,7 @@ GameObject:
   - component: {fileID: 272360972}
   m_Layer: 0
   m_Name: Plane
-  m_TagString: Untagged
+  m_TagString: Respawn
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6234,6 +6234,7 @@ MonoBehaviour:
   Direction: 0
   Enter: {fileID: 1497101816}
   Exit: {fileID: 776343832}
+  ParentChunk: {fileID: 0}
 --- !u!1 &370239716
 GameObject:
   m_ObjectHideFlags: 0
@@ -11504,6 +11505,7 @@ MonoBehaviour:
   Direction: 0
   Enter: {fileID: 991133335}
   Exit: {fileID: 2127614166}
+  ParentChunk: {fileID: 0}
 --- !u!1001 &881079219
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15708,7 +15710,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   VehiclePrefab: {fileID: 7322804155382567610, guid: c83e5568ca8fabe46be069b41c861694, type: 3}
   MaxPoolSize: 10
-  SpawnDelay: 1
+  SpawnDelay: 4
 --- !u!4 &1260871113
 Transform:
   m_ObjectHideFlags: 0

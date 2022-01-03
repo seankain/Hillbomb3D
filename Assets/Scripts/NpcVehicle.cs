@@ -8,6 +8,8 @@ public class NpcVehicle : MonoBehaviour
     public float currentTorque = 0f;
     public float Acceleration = 1f;
     public float wayPointDistanceThreshold = 5f;
+    public Transform ForwardCastLocation;
+    public float ForwardCastDistance = 10f;
     public List<AxleInfo> axleInfos; // the information about each individual axle
     public float maxMotorTorque; // maximum torque the motor can apply to wheel
     public float maxSteeringAngle; // maximum steer angle the wheel can have
@@ -17,12 +19,14 @@ public class NpcVehicle : MonoBehaviour
     private Rigidbody rb;
     private VehicleDriveState driveState;
 
+
     public float extremumSlip;
     public float extremumValue;
     public float asymptoteSlip;
     public float asymptoteValue;
     public float stiffness;
 
+    public HillChunk CurrentChunk;
     public float CurrentMotor { get { return motor; } }
     public float CurrentBrake { get { return brake; } }
     private float motor = 0;
@@ -39,12 +43,24 @@ public class NpcVehicle : MonoBehaviour
         waypoints = GameObject.FindGameObjectsWithTag("Waypoint").OrderBy(w => w.transform.position.z).ToArray();
         activeWaypoint = GetNextWayPoint();
         wheelHits = new WheelHit[4];
+        driveState = VehicleDriveState.Driving;
     }
 
     public void FixedUpdate()
     {
         if (!gameObject.activeSelf) { return; }
-        if (driveState == VehicleDriveState.Driving)
+
+        var obstacleDistance = DistanceFromNextObstruction();
+        //obstacle or red light to consider
+        if (obstacleDistance < Mathf.Infinity)
+        {
+            var arrivalTime = obstacleDistance / rb.velocity.z;
+            motor = rb.mass * (-rb.velocity.magnitude / arrivalTime);
+            Debug.Log($"Arrival time {arrivalTime} torque {motor}");
+
+        }
+        // no obstacle or red light to consider, go to max allowed speed
+        else
         {
             if (rb.velocity.magnitude < maxSpeedMetersPerSecond)
             {
@@ -69,16 +85,17 @@ public class NpcVehicle : MonoBehaviour
 
             }
         }
-        if (driveState == VehicleDriveState.Braking)
-        {
-            var dist = Vector3.Distance(gameObject.transform.position, activeWaypoint.transform.position);
-            var arrivalTime = dist / rb.velocity.magnitude;
-            brake = rb.mass * arrivalTime;
-        }
-        if(driveState == VehicleDriveState.Stopped)
-        {
-            return;
-        }
+
+        //if (driveState == VehicleDriveState.Braking)
+        //{
+        //    var dist = Vector3.Distance(gameObject.transform.position, activeWaypoint.transform.position);
+        //    var arrivalTime = dist / rb.velocity.magnitude;
+        //    brake = rb.mass * arrivalTime;
+        //}
+        //if (driveState == VehicleDriveState.Stopped)
+        //{
+        //    return;
+        //}
         steering = GetNextSteeringAngle();
         foreach (AxleInfo axleInfo in axleInfos)
         {
@@ -100,6 +117,41 @@ public class NpcVehicle : MonoBehaviour
         }
 
 
+    }
+
+    /// <summary>
+    /// Searches forward for obstructions and looks for imminent red lights and returns the closer one, infinity for nothing
+    /// </summary>
+    /// <returns>Distance in meters to obstruction requiring reaction</returns>
+    private float DistanceFromNextObstruction()
+    {
+        RaycastHit hit;
+        TrafficLight activeTrafficLight = null;
+        var obstruction = (Physics.SphereCast(ForwardCastLocation.position, 0.2f, ForwardCastLocation.forward, out hit, ForwardCastDistance,~1<<10));
+
+        if (activeWaypoint.BoundTrafficLight != null && activeWaypoint.BoundTrafficLight.CurrentState == TrafficLightState.LightStop)
+        {
+            activeTrafficLight = activeWaypoint.BoundTrafficLight;
+        }
+        //Red light, no obstruction
+        if (!obstruction && activeTrafficLight != null)
+        {
+            return Vector3.Distance(gameObject.transform.position, activeTrafficLight.gameObject.transform.position);
+        }
+        // Both redlight and obstruction, return closer
+        if (obstruction && activeTrafficLight != null)
+        {
+            Debug.Log($"{gameObject.name} seeing {hit.collider.gameObject.name}");
+            return Mathf.Min(Vector3.Distance(gameObject.transform.position, activeTrafficLight.gameObject.transform.position),
+                Vector3.Distance(gameObject.transform.position, hit.transform.position));
+        }
+        //Obstruction but no red light
+        if (obstruction && activeTrafficLight == null)
+        {
+            return Vector3.Distance(gameObject.transform.position, hit.transform.position);
+        }
+        //No red light, no obstruction
+        return float.PositiveInfinity;
     }
 
     private float GetNextSteeringAngle()
@@ -130,6 +182,8 @@ public class NpcVehicle : MonoBehaviour
     public void Update()
     {
         if (!gameObject.activeSelf) { return; }
+        //Player passed by just re-enter the pool
+        if (CurrentChunk.Passed) { gameObject.SetActive(false); return; }
         for (var i = 0; i < wheelColliders.Length; i++)
         {
             wheelColliders[i].forwardFriction = new WheelFrictionCurve
@@ -159,18 +213,31 @@ public class NpcVehicle : MonoBehaviour
         {
             var enteredWaypoint = other.GetComponent<Waypoint>();
             // hitting intersecting waypoints
-            if(enteredWaypoint != activeWaypoint) { return; }
+            if (enteredWaypoint != activeWaypoint) { return; }
             activeWaypoint = other.GetComponent<Waypoint>().NextWaypoints[Random.Range(0, enteredWaypoint.NextWaypoints.Count - 1)];
             //Consider changing all waypoint game object references to actual waypoint now that it holds more information
-            var nextWayPoint = activeWaypoint.GetComponent<Waypoint>();
-            if (nextWayPoint.BoundTrafficLight != null && nextWayPoint.BoundTrafficLight.CurrentState == TrafficLightState.LightStop)
-            {
-                BrakeToStop();
-            }
+            //var nextWayPoint = activeWaypoint.GetComponent<Waypoint>();
+            //if (nextWayPoint.BoundTrafficLight != null && nextWayPoint.BoundTrafficLight.CurrentState == TrafficLightState.LightStop)
+            //{
+            //    BrakeToStop();
+            //}
             Debug.Log($"Passing {other.gameObject.name}, traveling to {activeWaypoint.gameObject.name}");
         }
         //Leaving traffic, go back into pool
         if (other.gameObject.tag == "NpcSink")
+        {
+            gameObject.SetActive(false);
+        }
+        if (other.gameObject.tag == "ChunkStart")
+        {
+            var hillChunk = other.gameObject.GetComponentInParent<HillChunk>();
+            CurrentChunk = hillChunk;
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.other.tag == "Respawn")
         {
             gameObject.SetActive(false);
         }
@@ -183,6 +250,7 @@ public class NpcVehicle : MonoBehaviour
 
     private void BrakeToStop()
     {
+        Debug.Log("Braking to stop");
         driveState = VehicleDriveState.Braking;
     }
 
