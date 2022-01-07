@@ -36,6 +36,7 @@ public class ChunkCycler : MonoBehaviour
                     c.transform.position -= pos;
                 }
                 Player.transform.position -= pos;
+                MoveObstacles(chunk,pos);
             }
             if (chunk.Passed)
             {
@@ -74,12 +75,14 @@ public class ChunkCycler : MonoBehaviour
 
     private void MoveObstacles(HillChunk chunk, Vector3 dist)
     {
+        var pos = chunk.gameObject.transform.position;
         var npcVehicles = FindObjectsOfType<NpcVehicle>();
         foreach(var npcVehicle in npcVehicles)
         {
             if(npcVehicle.CurrentChunk == chunk)
             {
-                npcVehicle.transform.position -= dist;
+            
+                npcVehicle.transform.position = (npcVehicle.transform.position - dist);
             }
         }
     }

@@ -56,7 +56,7 @@ public class NpcVehicle : MonoBehaviour
         {
             var arrivalTime = obstacleDistance / rb.velocity.z;
             motor = rb.mass * (-rb.velocity.magnitude / arrivalTime);
-            Debug.Log($"Arrival time {arrivalTime} torque {motor}");
+           // Debug.Log($"Arrival time {arrivalTime} torque {motor}");
 
         }
         // no obstacle or red light to consider, go to max allowed speed
@@ -221,7 +221,7 @@ public class NpcVehicle : MonoBehaviour
             //{
             //    BrakeToStop();
             //}
-            Debug.Log($"Passing {other.gameObject.name}, traveling to {activeWaypoint.gameObject.name}");
+           // Debug.Log($"Passing {other.gameObject.name}, traveling to {activeWaypoint.gameObject.name}");
         }
         //Leaving traffic, go back into pool
         if (other.gameObject.tag == "NpcSink")
@@ -232,6 +232,13 @@ public class NpcVehicle : MonoBehaviour
         {
             var hillChunk = other.gameObject.GetComponentInParent<HillChunk>();
             CurrentChunk = hillChunk;
+            activeWaypoint = hillChunk.InboundTopWaypoint;
+        }
+        if(other.gameObject.tag == "ChunkEnd")
+        {
+            var hillChunk = other.gameObject.GetComponentInParent<HillChunk>();
+            CurrentChunk = hillChunk;
+            activeWaypoint = hillChunk.OutboundBottomWaypoint;
         }
     }
 

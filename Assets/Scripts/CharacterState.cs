@@ -12,6 +12,8 @@ public class CharacterState : MonoBehaviour
 
     public Vector3 FrontBoltVec;
     public Vector3 RearBoltVec;
+
+    public bool Grounded = true;
     // Start is called before the first frame update
     void Start()
     {
@@ -22,7 +24,10 @@ public class CharacterState : MonoBehaviour
     void Update()
     {
 
-        anim.SetBool("Pushing", Input.GetAxis("Vertical") > 0); 
+        if (Grounded)
+        {
+            anim.SetBool("Pushing", Input.GetAxis("Vertical") > 0);
+        }
         anim.SetFloat("Speed", rb.velocity.magnitude);
     }
 

@@ -62,6 +62,7 @@ public class BoardController : MonoBehaviour
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
         var jump = Input.GetAxis("Jump");
+        characterState.Grounded = Grounded;
         if (jump > 0) { ollieStarted = true; }
         if (jump < lastJump && ollieStarted && Grounded)
         {
