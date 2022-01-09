@@ -35,6 +35,8 @@ public class NpcVehicle : MonoBehaviour
     private GameObject[] waypoints;
     private Waypoint activeWaypoint;
     private WheelHit[] wheelHits;
+    private ChunkCycler chunkCycler;
+
     public void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -44,6 +46,7 @@ public class NpcVehicle : MonoBehaviour
         activeWaypoint = GetNextWayPoint();
         wheelHits = new WheelHit[4];
         driveState = VehicleDriveState.Driving;
+        chunkCycler = FindObjectOfType<ChunkCycler>();
     }
 
     public void FixedUpdate()
@@ -214,6 +217,14 @@ public class NpcVehicle : MonoBehaviour
             var enteredWaypoint = other.GetComponent<Waypoint>();
             // hitting intersecting waypoints
             if (enteredWaypoint != activeWaypoint) { return; }
+            if(enteredWaypoint.NextWaypoints.Count < 1)
+            {
+                //Waypoints with no next waypoint were causing helpless zombie vehicles
+                //this might make them visibly vanish if the waypoints are misconfigured
+                //but would otherwise act like a sink
+                gameObject.SetActive(false);
+                return;
+            }
             activeWaypoint = other.GetComponent<Waypoint>().NextWaypoints[Random.Range(0, enteredWaypoint.NextWaypoints.Count - 1)];
             //Consider changing all waypoint game object references to actual waypoint now that it holds more information
             //var nextWayPoint = activeWaypoint.GetComponent<Waypoint>();
@@ -231,14 +242,48 @@ public class NpcVehicle : MonoBehaviour
         if (other.gameObject.tag == "ChunkStart")
         {
             var hillChunk = other.gameObject.GetComponentInParent<HillChunk>();
-            CurrentChunk = hillChunk;
-            activeWaypoint = hillChunk.InboundTopWaypoint;
+            //is this just the start to the chunk we've been in
+            if (hillChunk == CurrentChunk && chunkCycler.TryGetNeighborChunk(CurrentChunk,activeWaypoint.TravelDirection,out var neighborChunk))
+            {
+                CurrentChunk = neighborChunk;
+            }
+            else
+            {
+                CurrentChunk = hillChunk;
+            }
+            
+            if (activeWaypoint.TravelDirection == TravelDirection.Outbound)
+            {
+                //Go to the bottom of the chunk further back in z axis
+                activeWaypoint = CurrentChunk.OutboundBottomWaypoint;
+            }
+            else
+            {
+                //start at top of next chunk like normal
+                activeWaypoint = CurrentChunk.InboundTopWaypoint;
+            }
         }
         if(other.gameObject.tag == "ChunkEnd")
         {
             var hillChunk = other.gameObject.GetComponentInParent<HillChunk>();
             CurrentChunk = hillChunk;
             activeWaypoint = hillChunk.OutboundBottomWaypoint;
+            if (activeWaypoint.TravelDirection == TravelDirection.Outbound)
+            {
+                activeWaypoint = hillChunk.OutboundBottomWaypoint;
+            }
+            else
+            {
+                if (chunkCycler.TryGetNeighborChunk(CurrentChunk, activeWaypoint.TravelDirection, out var neighborChunk))
+                {
+                    activeWaypoint = hillChunk.InboundTopWaypoint;
+                }
+                else {
+                    gameObject.SetActive(false);
+                    Debug.Log("No neighbor chunk, just go inactive and prepare for recycling");
+                }
+                
+            }
         }
     }
 

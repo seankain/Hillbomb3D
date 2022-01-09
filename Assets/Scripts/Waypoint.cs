@@ -7,7 +7,7 @@ public class Waypoint : MonoBehaviour
 
     public List<Waypoint> NextWaypoints;
     public GameObject DebugMesh;
-    public Vector3 TravelDirection;
+    public TravelDirection TravelDirection;
 
     public TrafficLight BoundTrafficLight;
 
@@ -19,4 +19,9 @@ public class Waypoint : MonoBehaviour
             DebugMesh.SetActive(false);
         }
     }
+}
+
+public enum TravelDirection { 
+    Inbound,
+    Outbound
 }

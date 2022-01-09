@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ChunkCycler : MonoBehaviour
@@ -43,6 +44,37 @@ public class ChunkCycler : MonoBehaviour
                 MoveChunk(chunk);
             }
         }
+    }
+
+    public bool TryGetNeighborChunk(HillChunk currentChunk,TravelDirection direction,out HillChunk neighborChunk) 
+    {
+        var sortedChunks = ChunkPool.OrderBy(c => c.transform.position.z).ToArray();
+        for(var i = 0; i < sortedChunks.Length; i++)
+        {
+            if(sortedChunks[i].name == currentChunk.name)
+            {
+                if(direction == TravelDirection.Inbound) 
+                {
+                    //Go forward in z axis since chunks progress in z axis and inbound is positive on z
+                    if(i+1<=sortedChunks.Length - 1)
+                    {
+                        neighborChunk = sortedChunks[i + 1];
+                        return true; 
+                    }
+                }
+                else
+                {
+                    //Go backward in z axis
+                    if (i - 1 >= 0)
+                    {
+                        neighborChunk = sortedChunks[i - 1];
+                        return true;
+                    }
+                }
+            }
+        }
+        neighborChunk = null;
+        return false;
     }
 
     void MoveChunk(HillChunk chunk)

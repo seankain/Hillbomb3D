@@ -33,38 +33,52 @@ public class VehiclePrefabPool : MonoBehaviour
         }
     }
 
-    private VehicleEmitterLocation GetSpawnPosition() 
+    private List<VehicleEmitterLocation> GetUnoccupiedEmitterLocations()
     {
-        var idx = Random.Range(0, vehicleEmitters.Length - 1);
-        return vehicleEmitters[idx];
-        //foreach(var c in chunkCycler.ChunkPool)
-        //{
-        //    gameObject.transform.w
-        //}
+        var unoccupied = new List<VehicleEmitterLocation>();
+        for(var i = 0; i < vehicleEmitters.Length; i++)
+        {
+            if (!vehicleEmitters[i].Occupied)
+            {
+                unoccupied.Add(vehicleEmitters[i]);
+            }
+        }
+        return unoccupied;
+    }
+
+    private bool TryGetSpawnPosition(out VehicleEmitterLocation position) 
+    {
+        var unoccupiedEmitters = GetUnoccupiedEmitterLocations();
+        if(unoccupiedEmitters.Count < 1) { position = null; return false; }
+        var idx = Random.Range(0, unoccupiedEmitters.Count - 1);
+        position = unoccupiedEmitters[idx];
+        return true;
     }
 
     private void SpawnVehicle()
     {
-        var spawnPosition = GetSpawnPosition();
-        if (pool.Count < MaxPoolSize)
+        if (TryGetSpawnPosition(out var spawnPosition))
         {
-            var prefab = Instantiate(VehiclePrefab, spawnPosition.Enter.position, spawnPosition.Enter.rotation, null);
-            var vehicle = prefab.GetComponent<NpcVehicle>();
-            vehicle.CurrentChunk = spawnPosition.ParentChunk;
-            prefab.GetComponent<MeshCycler>().SetRandomMesh();
-            pool.Add(vehicle);
-        }
-        else
-        {
-            foreach(var p in pool)
+            if (pool.Count < MaxPoolSize)
             {
-                if (!p.isActiveAndEnabled)
+                var prefab = Instantiate(VehiclePrefab, spawnPosition.Enter.position, spawnPosition.Enter.rotation, null);
+                var vehicle = prefab.GetComponent<NpcVehicle>();
+                vehicle.CurrentChunk = spawnPosition.ParentChunk;
+                prefab.GetComponent<MeshCycler>().SetRandomMesh();
+                pool.Add(vehicle);
+            }
+            else
+            {
+                foreach (var p in pool)
                 {
-                    p.gameObject.SetActive(true);
-                    p.gameObject.transform.position = spawnPosition.Enter.position;
-                    p.gameObject.transform.rotation = spawnPosition.Enter.rotation;
-                    p.CurrentChunk = spawnPosition.ParentChunk;
-                    p.GetComponent<MeshCycler>().SetRandomMesh();
+                    if (!p.isActiveAndEnabled)
+                    {
+                        p.gameObject.SetActive(true);
+                        p.gameObject.transform.position = spawnPosition.Enter.position;
+                        p.gameObject.transform.rotation = spawnPosition.Enter.rotation;
+                        p.CurrentChunk = spawnPosition.ParentChunk;
+                        p.GetComponent<MeshCycler>().SetRandomMesh();
+                    }
                 }
             }
         }
