@@ -219,9 +219,27 @@ public class NpcVehicle : MonoBehaviour
             if (enteredWaypoint != activeWaypoint) { return; }
             if(enteredWaypoint.NextWaypoints.Count < 1)
             {
-                //Waypoints with no next waypoint were causing helpless zombie vehicles
-                //this might make them visibly vanish if the waypoints are misconfigured
-                //but would otherwise act like a sink
+                //This can happen if a waypoint was never configured or its the start or end of a chunk
+                if (enteredWaypoint.TravelDirection == TravelDirection.Inbound && enteredWaypoint == CurrentChunk.InboundBottomWaypoint)
+                {
+                    if(chunkCycler.TryGetNeighborChunk(CurrentChunk,enteredWaypoint.TravelDirection,out var neighborChunk))
+                    {
+                        CurrentChunk = neighborChunk;
+                        activeWaypoint = CurrentChunk.InboundTopWaypoint;
+                        return;
+                    }
+                }
+
+                if (enteredWaypoint.TravelDirection == TravelDirection.Outbound && enteredWaypoint == CurrentChunk.OutboundTopWaypoint) {
+                    if (chunkCycler.TryGetNeighborChunk(CurrentChunk, enteredWaypoint.TravelDirection, out var neighborChunk))
+                    {
+                        CurrentChunk = neighborChunk;
+                        activeWaypoint = CurrentChunk.OutboundTopWaypoint;
+                        return;
+                    }
+
+                }
+
                 gameObject.SetActive(false);
                 return;
             }
@@ -262,6 +280,7 @@ public class NpcVehicle : MonoBehaviour
                 //start at top of next chunk like normal
                 activeWaypoint = CurrentChunk.InboundTopWaypoint;
             }
+            Debug.Log($"{name} entered chunk start for {CurrentChunk} going to {activeWaypoint}");
         }
         if(other.gameObject.tag == "ChunkEnd")
         {
@@ -284,6 +303,7 @@ public class NpcVehicle : MonoBehaviour
                 }
                 
             }
+            Debug.Log($"{name} entered chunk start for {CurrentChunk} going to {activeWaypoint}");
         }
     }
 

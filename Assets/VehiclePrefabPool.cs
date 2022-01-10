@@ -78,6 +78,7 @@ public class VehiclePrefabPool : MonoBehaviour
                         p.gameObject.transform.rotation = spawnPosition.Enter.rotation;
                         p.CurrentChunk = spawnPosition.ParentChunk;
                         p.GetComponent<MeshCycler>().SetRandomMesh();
+                        return;
                     }
                 }
             }
