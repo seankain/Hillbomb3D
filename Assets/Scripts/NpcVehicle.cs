@@ -14,6 +14,7 @@ public class NpcVehicle : MonoBehaviour
     public float maxMotorTorque; // maximum torque the motor can apply to wheel
     public float maxSteeringAngle; // maximum steer angle the wheel can have
     public float maxSpeedMetersPerSecond = 13;
+    public Waypoint ActiveWaypoint;
     private bool[] wheelGroundedState;
     private WheelCollider[] wheelColliders;
     private Rigidbody rb;
@@ -33,7 +34,7 @@ public class NpcVehicle : MonoBehaviour
     private float brake = 0;
     private float steering = 0;
     private GameObject[] waypoints;
-    private Waypoint activeWaypoint;
+    
     private WheelHit[] wheelHits;
     private ChunkCycler chunkCycler;
 
@@ -43,7 +44,7 @@ public class NpcVehicle : MonoBehaviour
         wheelColliders = GetComponentsInChildren<WheelCollider>();
         wheelGroundedState = new bool[wheelColliders.Length];
         waypoints = GameObject.FindGameObjectsWithTag("Waypoint").OrderBy(w => w.transform.position.z).ToArray();
-        activeWaypoint = GetNextWayPoint();
+        ActiveWaypoint = GetNextWayPoint();
         wheelHits = new WheelHit[4];
         driveState = VehicleDriveState.Driving;
         chunkCycler = FindObjectOfType<ChunkCycler>();
@@ -132,9 +133,9 @@ public class NpcVehicle : MonoBehaviour
         TrafficLight activeTrafficLight = null;
         var obstruction = (Physics.SphereCast(ForwardCastLocation.position, 0.2f, ForwardCastLocation.forward, out hit, ForwardCastDistance,~1<<10));
 
-        if (activeWaypoint.BoundTrafficLight != null && activeWaypoint.BoundTrafficLight.CurrentState == TrafficLightState.LightStop)
+        if (ActiveWaypoint.BoundTrafficLight != null && ActiveWaypoint.BoundTrafficLight.CurrentState == TrafficLightState.LightStop)
         {
-            activeTrafficLight = activeWaypoint.BoundTrafficLight;
+            activeTrafficLight = ActiveWaypoint.BoundTrafficLight;
         }
         //Red light, no obstruction
         if (!obstruction && activeTrafficLight != null)
@@ -159,7 +160,7 @@ public class NpcVehicle : MonoBehaviour
 
     private float GetNextSteeringAngle()
     {
-        var target = activeWaypoint.transform.position;
+        var target = ActiveWaypoint.transform.position;
         var targetDir = target - transform.position;
         return -Vector3.SignedAngle(targetDir, transform.forward, Vector3.up);
     }
@@ -187,6 +188,10 @@ public class NpcVehicle : MonoBehaviour
         if (!gameObject.activeSelf) { return; }
         //Player passed by just re-enter the pool
         if (CurrentChunk.Passed) { gameObject.SetActive(false); return; }
+        if(Mathf.Abs(gameObject.transform.rotation.z) >= 80  || Mathf.Abs(gameObject.transform.rotation.x) >= 80)
+        {
+            gameObject.SetActive(false);return;
+        }
         for (var i = 0; i < wheelColliders.Length; i++)
         {
             wheelColliders[i].forwardFriction = new WheelFrictionCurve
@@ -216,7 +221,7 @@ public class NpcVehicle : MonoBehaviour
         {
             var enteredWaypoint = other.GetComponent<Waypoint>();
             // hitting intersecting waypoints
-            if (enteredWaypoint != activeWaypoint) { return; }
+            if (enteredWaypoint != ActiveWaypoint) { return; }
             if(enteredWaypoint.NextWaypoints.Count < 1)
             {
                 //This can happen if a waypoint was never configured or its the start or end of a chunk
@@ -225,7 +230,7 @@ public class NpcVehicle : MonoBehaviour
                     if(chunkCycler.TryGetNeighborChunk(CurrentChunk,enteredWaypoint.TravelDirection,out var neighborChunk))
                     {
                         CurrentChunk = neighborChunk;
-                        activeWaypoint = CurrentChunk.InboundTopWaypoint;
+                        ActiveWaypoint = CurrentChunk.InboundTopWaypoint;
                         return;
                     }
                 }
@@ -234,7 +239,7 @@ public class NpcVehicle : MonoBehaviour
                     if (chunkCycler.TryGetNeighborChunk(CurrentChunk, enteredWaypoint.TravelDirection, out var neighborChunk))
                     {
                         CurrentChunk = neighborChunk;
-                        activeWaypoint = CurrentChunk.OutboundTopWaypoint;
+                        ActiveWaypoint = CurrentChunk.OutboundTopWaypoint;
                         return;
                     }
 
@@ -243,7 +248,7 @@ public class NpcVehicle : MonoBehaviour
                 gameObject.SetActive(false);
                 return;
             }
-            activeWaypoint = other.GetComponent<Waypoint>().NextWaypoints[Random.Range(0, enteredWaypoint.NextWaypoints.Count - 1)];
+            ActiveWaypoint = other.GetComponent<Waypoint>().NextWaypoints[Random.Range(0, enteredWaypoint.NextWaypoints.Count - 1)];
             //Consider changing all waypoint game object references to actual waypoint now that it holds more information
             //var nextWayPoint = activeWaypoint.GetComponent<Waypoint>();
             //if (nextWayPoint.BoundTrafficLight != null && nextWayPoint.BoundTrafficLight.CurrentState == TrafficLightState.LightStop)
@@ -261,7 +266,7 @@ public class NpcVehicle : MonoBehaviour
         {
             var hillChunk = other.gameObject.GetComponentInParent<HillChunk>();
             //is this just the start to the chunk we've been in
-            if (hillChunk == CurrentChunk && chunkCycler.TryGetNeighborChunk(CurrentChunk,activeWaypoint.TravelDirection,out var neighborChunk))
+            if (hillChunk == CurrentChunk && chunkCycler.TryGetNeighborChunk(CurrentChunk,ActiveWaypoint.TravelDirection,out var neighborChunk))
             {
                 CurrentChunk = neighborChunk;
             }
@@ -270,32 +275,32 @@ public class NpcVehicle : MonoBehaviour
                 CurrentChunk = hillChunk;
             }
             
-            if (activeWaypoint.TravelDirection == TravelDirection.Outbound)
+            if (ActiveWaypoint.TravelDirection == TravelDirection.Outbound)
             {
                 //Go to the bottom of the chunk further back in z axis
-                activeWaypoint = CurrentChunk.OutboundBottomWaypoint;
+                ActiveWaypoint = CurrentChunk.OutboundBottomWaypoint;
             }
             else
             {
                 //start at top of next chunk like normal
-                activeWaypoint = CurrentChunk.InboundTopWaypoint;
+                ActiveWaypoint = CurrentChunk.InboundTopWaypoint;
             }
-            Debug.Log($"{name} entered chunk start for {CurrentChunk} going to {activeWaypoint}");
+            Debug.Log($"{name} entered chunk start for {CurrentChunk} going to {ActiveWaypoint}");
         }
         if(other.gameObject.tag == "ChunkEnd")
         {
             var hillChunk = other.gameObject.GetComponentInParent<HillChunk>();
             CurrentChunk = hillChunk;
-            activeWaypoint = hillChunk.OutboundBottomWaypoint;
-            if (activeWaypoint.TravelDirection == TravelDirection.Outbound)
+            ActiveWaypoint = hillChunk.OutboundBottomWaypoint;
+            if (ActiveWaypoint.TravelDirection == TravelDirection.Outbound)
             {
-                activeWaypoint = hillChunk.OutboundBottomWaypoint;
+                ActiveWaypoint = hillChunk.OutboundBottomWaypoint;
             }
             else
             {
-                if (chunkCycler.TryGetNeighborChunk(CurrentChunk, activeWaypoint.TravelDirection, out var neighborChunk))
+                if (chunkCycler.TryGetNeighborChunk(CurrentChunk, ActiveWaypoint.TravelDirection, out var neighborChunk))
                 {
-                    activeWaypoint = hillChunk.InboundTopWaypoint;
+                    ActiveWaypoint = neighborChunk.InboundTopWaypoint;
                 }
                 else {
                     gameObject.SetActive(false);
@@ -303,13 +308,13 @@ public class NpcVehicle : MonoBehaviour
                 }
                 
             }
-            Debug.Log($"{name} entered chunk start for {CurrentChunk} going to {activeWaypoint}");
+            Debug.Log($"{name} entered chunk start for {CurrentChunk} going to {ActiveWaypoint}");
         }
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.other.tag == "Respawn")
+        if (collision.other.tag == "Kill")
         {
             gameObject.SetActive(false);
         }

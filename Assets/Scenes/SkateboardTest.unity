@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 2035111234}
-  m_IndirectSpecularColor: {r: 190.39693, g: 580.02484, b: 742.7701, a: 1}
+  m_IndirectSpecularColor: {r: 190.45555, g: 580.03656, b: 742.7486, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2490,6 +2490,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1952357190}
     m_Modifications:
     - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: TravelDirection
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: BoundTrafficLight
       value: 
       objectReference: {fileID: 1345340602}
@@ -2788,6 +2792,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1952357190}
     m_Modifications:
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: TravelDirection
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: NextWaypoints.Array.size
       value: 1
@@ -3163,6 +3171,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1952357190}
     m_Modifications:
     - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: TravelDirection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: TravelDirection.z
       value: -1
       objectReference: {fileID: 0}
@@ -3530,6 +3542,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1768825422}
     m_Modifications:
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: TravelDirection
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 679086922037865629, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: m_RootOrder
       value: 40
@@ -4531,6 +4547,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1982508186}
     - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: TravelDirection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: NextWaypoints.Array.size
       value: 3
       objectReference: {fileID: 0}
@@ -5199,7 +5219,7 @@ GameObject:
   - component: {fileID: 272360972}
   m_Layer: 0
   m_Name: Plane
-  m_TagString: Respawn
+  m_TagString: Kill
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5316,7 +5336,7 @@ MonoBehaviour:
   LevelDirection: {x: 0, y: 0, z: 1}
   SurfaceAngleEuler: {x: 0, y: 0, z: 0}
   ArbitraryConstant: 1
-  TurnForceConstant: 90
+  TurnForceConstant: 400
   MaxTurnTime: 3
   PowerSlideSpeed: 1000
   MaxPushSpeed: 10
@@ -5550,6 +5570,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1952357190}
     m_Modifications:
     - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: TravelDirection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: BoundTrafficLight
       value: 
       objectReference: {fileID: 1773903507}
@@ -5638,6 +5662,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1952357190}
     m_Modifications:
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: TravelDirection
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: NextWaypoints.Array.size
       value: 2
@@ -6538,7 +6566,7 @@ MonoBehaviour:
   Direction: 0
   Enter: {fileID: 1497101816}
   Exit: {fileID: 776343832}
-  ParentChunk: {fileID: 0}
+  ParentChunk: {fileID: 1952357191}
 --- !u!1 &370239716
 GameObject:
   m_ObjectHideFlags: 0
@@ -6895,6 +6923,7 @@ MonoBehaviour:
   RearBoltPosition: {fileID: 827610843}
   FrontBoltVec: {x: 0, y: 0, z: 0}
   RearBoltVec: {x: 0, y: 0, z: 0}
+  Grounded: 1
 --- !u!1001 &400068306
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7512,6 +7541,10 @@ PrefabInstance:
     - target: {fileID: 100000, guid: 4e3b8318a9112f24d84095e1a4d96ae0, type: 3}
       propertyPath: m_Name
       value: Prop_Dumpster
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 4e3b8318a9112f24d84095e1a4d96ae0, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 4e3b8318a9112f24d84095e1a4d96ae0, type: 3}
       propertyPath: m_RootOrder
@@ -8271,7 +8304,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NextWaypoints: []
   DebugMesh: {fileID: 0}
-  TravelDirection: {x: 0, y: 0, z: 0}
+  TravelDirection: 0
   BoundTrafficLight: {fileID: 0}
 --- !u!65 &506573694
 BoxCollider:
@@ -8886,6 +8919,10 @@ PrefabInstance:
       propertyPath: NextWaypoint
       value: 
       objectReference: {fileID: 722926766}
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: TravelDirection
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: NextWaypoints.Array.size
       value: 3
@@ -9581,6 +9618,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1952357190}
     m_Modifications:
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: TravelDirection
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: NextWaypoints.Array.size
       value: 1
@@ -10983,7 +11024,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NextWaypoints: []
   DebugMesh: {fileID: 0}
-  TravelDirection: {x: 0, y: 0, z: 0}
+  TravelDirection: 0
   BoundTrafficLight: {fileID: 0}
 --- !u!65 &776343834
 BoxCollider:
@@ -12025,6 +12066,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_PolygonPrototype_Buildings_Ramp_25_1x1_01P
       objectReference: {fileID: 0}
+    - target: {fileID: 1860949050935862, guid: 35b4129ac994d4e49a7699deb68ac65b, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 4062878138970036, guid: 35b4129ac994d4e49a7699deb68ac65b, type: 3}
       propertyPath: m_RootOrder
       value: 6
@@ -12313,6 +12358,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1837300080}
     m_Modifications:
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: TravelDirection
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 679086922037865629, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: m_RootOrder
       value: 41
@@ -12486,7 +12535,7 @@ PrefabInstance:
     - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: BoundTrafficLight
       value: 
-      objectReference: {fileID: 1345340602}
+      objectReference: {fileID: 392339634}
     - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: NextWaypoints.Array.size
       value: 1
@@ -13588,7 +13637,7 @@ MonoBehaviour:
   NextWaypoints:
   - {fileID: 653197133}
   DebugMesh: {fileID: 0}
-  TravelDirection: {x: 0, y: 0, z: 0}
+  TravelDirection: 0
   BoundTrafficLight: {fileID: 0}
 --- !u!65 &991133337
 BoxCollider:
@@ -13743,7 +13792,7 @@ GameObject:
   - component: {fileID: 1035882930}
   m_Layer: 0
   m_Name: ExitTrigger
-  m_TagString: Untagged
+  m_TagString: ChunkEnd
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14346,7 +14395,7 @@ GameObject:
   - component: {fileID: 1098735298}
   m_Layer: 0
   m_Name: EnterTrigger
-  m_TagString: Untagged
+  m_TagString: ChunkStart
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14402,6 +14451,10 @@ PrefabInstance:
       propertyPath: NextWaypoint
       value: 
       objectReference: {fileID: 653420260}
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: TravelDirection
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: BoundTrafficLight
       value: 
@@ -14468,6 +14521,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+--- !u!114 &1102864458 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+  m_PrefabInstance: {fileID: 1272916518}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2436d056493821f4bb751c26935081d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1117544030
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15478,6 +15542,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1768825422}
     m_Modifications:
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: TravelDirection
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 679086922037865629, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: m_RootOrder
       value: 41
@@ -15559,7 +15627,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1187728466}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -21.44, z: 82.73}
+  m_LocalPosition: {x: 0, y: -21.44, z: 86.27}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1837300080}
@@ -15829,7 +15897,7 @@ MonoBehaviour:
   Direction: 0
   Enter: {fileID: 1514348613}
   Exit: {fileID: 506573695}
-  ParentChunk: {fileID: 0}
+  ParentChunk: {fileID: 1952357191}
 --- !u!1 &1193894363
 GameObject:
   m_ObjectHideFlags: 0
@@ -16423,7 +16491,7 @@ GameObject:
   - component: {fileID: 1234337976}
   m_Layer: 0
   m_Name: EnterTrigger
-  m_TagString: Untagged
+  m_TagString: ChunkStart
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -16599,7 +16667,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   VehiclePrefab: {fileID: 7322804155382567610, guid: c83e5568ca8fabe46be069b41c861694, type: 3}
-  MaxPoolSize: 40
+  MaxPoolSize: 20
   SpawnDelay: 2
 --- !u!4 &1260871113
 Transform:
@@ -16723,9 +16791,21 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1598837458}
     - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: TravelDirection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: TravelDirection.z
       value: -1
       objectReference: {fileID: 0}
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: NextWaypoints.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: NextWaypoints.Array.data[0]
+      value: 
+      objectReference: {fileID: 1598837458}
     - target: {fileID: 679086922037865629, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: m_RootOrder
       value: 42
@@ -16794,9 +16874,21 @@ PrefabInstance:
     m_TransformParent: {fileID: 1768825422}
     m_Modifications:
     - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: TravelDirection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: TravelDirection.z
       value: -1
       objectReference: {fileID: 0}
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: NextWaypoints.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: NextWaypoints.Array.data[0]
+      value: 
+      objectReference: {fileID: 425784599}
     - target: {fileID: 679086922037865629, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: m_RootOrder
       value: 43
@@ -19538,7 +19630,7 @@ MonoBehaviour:
   NextWaypoints:
   - {fileID: 1370161038}
   DebugMesh: {fileID: 0}
-  TravelDirection: {x: 0, y: 0, z: 0}
+  TravelDirection: 0
   BoundTrafficLight: {fileID: 0}
 --- !u!65 &1497101818
 BoxCollider:
@@ -19695,7 +19787,7 @@ MonoBehaviour:
   NextWaypoints:
   - {fileID: 360888415}
   DebugMesh: {fileID: 0}
-  TravelDirection: {x: 0, y: 0, z: 0}
+  TravelDirection: 0
   BoundTrafficLight: {fileID: 0}
 --- !u!65 &1514348615
 BoxCollider:
@@ -20922,6 +21014,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1837300080}
     m_Modifications:
     - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: TravelDirection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: TravelDirection.z
       value: -1
       objectReference: {fileID: 0}
@@ -21869,7 +21965,7 @@ MonoBehaviour:
   Direction: 0
   Enter: {fileID: 1691508220}
   Exit: {fileID: 1851043936}
-  ParentChunk: {fileID: 0}
+  ParentChunk: {fileID: 1952357191}
 --- !u!1 &1687021473
 GameObject:
   m_ObjectHideFlags: 0
@@ -22012,7 +22108,7 @@ MonoBehaviour:
   NextWaypoints:
   - {fileID: 1627087555}
   DebugMesh: {fileID: 0}
-  TravelDirection: {x: 0, y: 0, z: 0}
+  TravelDirection: 0
   BoundTrafficLight: {fileID: 0}
 --- !u!65 &1691508222
 BoxCollider:
@@ -22759,9 +22855,9 @@ MonoBehaviour:
   EntryTrigger: {fileID: 1098735298}
   ExitTrigger: {fileID: 2039051487}
   InboundTopWaypoint: {fileID: 1582683580}
-  InboundBottomWaypoint: {fileID: 0}
+  InboundBottomWaypoint: {fileID: 1850942887}
   OutboundTopWaypoint: {fileID: 425784599}
-  OutboundBottomWaypoint: {fileID: 1850942887}
+  OutboundBottomWaypoint: {fileID: 1102864458}
 --- !u!114 &1773903507 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7077167216587951259, guid: ab9728b6a47cf9a41b1477df99adab2d, type: 3}
@@ -24974,6 +25070,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1952357190}
     m_Modifications:
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: TravelDirection
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 679086922037865629, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: m_RootOrder
       value: 23
@@ -25479,7 +25579,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NextWaypoints: []
   DebugMesh: {fileID: 0}
-  TravelDirection: {x: 0, y: 0, z: 0}
+  TravelDirection: 0
   BoundTrafficLight: {fileID: 0}
 --- !u!65 &1851043935
 BoxCollider:
@@ -25652,6 +25752,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1768825422}
     m_Modifications:
     - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: TravelDirection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: TravelDirection.z
       value: -1
       objectReference: {fileID: 0}
@@ -25719,6 +25823,18 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: NextWaypoint
+      value: 
+      objectReference: {fileID: 909702937}
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: TravelDirection
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: NextWaypoints.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: NextWaypoints.Array.data[0]
       value: 
       objectReference: {fileID: 909702937}
     - target: {fileID: 679086922037865629, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
@@ -25902,9 +26018,21 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 295824014}
     - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: TravelDirection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: TravelDirection.z
       value: -1
       objectReference: {fileID: 0}
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: NextWaypoints.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: NextWaypoints.Array.data[0]
+      value: 
+      objectReference: {fileID: 1102864458}
     - target: {fileID: 679086922037865629, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: m_RootOrder
       value: 6
@@ -26241,6 +26369,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1952357190}
     m_Modifications:
+    - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
+      propertyPath: TravelDirection
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 679086922037865628, guid: 78c02527417d7e1469b6fc53dbae3177, type: 3}
       propertyPath: BoundTrafficLight
       value: 
@@ -27407,7 +27539,7 @@ GameObject:
   - component: {fileID: 2039051487}
   m_Layer: 0
   m_Name: ExitTrigger
-  m_TagString: Untagged
+  m_TagString: ChunkEnd
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -29129,7 +29261,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NextWaypoints: []
   DebugMesh: {fileID: 0}
-  TravelDirection: {x: 0, y: 0, z: 0}
+  TravelDirection: 0
   BoundTrafficLight: {fileID: 0}
 --- !u!65 &2127614168
 BoxCollider:
