@@ -188,7 +188,7 @@ public class NpcVehicle : MonoBehaviour
         if (!gameObject.activeSelf) { return; }
         //Player passed by just re-enter the pool
         if (CurrentChunk.Passed) { gameObject.SetActive(false); return; }
-        if(Mathf.Abs(gameObject.transform.rotation.z) >= 80  || Mathf.Abs(gameObject.transform.rotation.x) >= 80)
+        if((Mathf.Abs(gameObject.transform.rotation.eulerAngles.z) >= 90  && Mathf.Abs(gameObject.transform.rotation.eulerAngles.z) <= 270) || (Mathf.Abs(gameObject.transform.rotation.eulerAngles.x) >= 80 ) && Mathf.Abs(gameObject.transform.rotation.eulerAngles.x) <= 270)
         {
             gameObject.SetActive(false);return;
         }
@@ -300,6 +300,7 @@ public class NpcVehicle : MonoBehaviour
             {
                 if (chunkCycler.TryGetNeighborChunk(CurrentChunk, ActiveWaypoint.TravelDirection, out var neighborChunk))
                 {
+                    CurrentChunk = neighborChunk;
                     ActiveWaypoint = neighborChunk.InboundTopWaypoint;
                 }
                 else {

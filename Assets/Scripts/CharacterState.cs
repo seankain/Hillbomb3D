@@ -14,6 +14,7 @@ public class CharacterState : MonoBehaviour
     public Vector3 RearBoltVec;
 
     public bool Grounded = true;
+    private bool bailed = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -36,9 +37,19 @@ public class CharacterState : MonoBehaviour
         anim.SetTrigger("Ollie");
     }
 
+    public void Bail() 
+    {
+        bailed = true;
+    }
+
+    public void Respawn()
+    {
+        bailed = false;
+    }
+
     void OnAnimatorIK(int layerIndex)
     {
-        if (!anim.GetBool("Pushing"))
+        if (!anim.GetBool("Pushing") && !bailed)
         {
             FrontBoltVec = FrontBoltPosition.position;
             RearBoltVec = RearBoltPosition.position;

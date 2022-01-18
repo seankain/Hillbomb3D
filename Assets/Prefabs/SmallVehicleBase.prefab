@@ -1896,6 +1896,7 @@ MonoBehaviour:
   maxMotorTorque: 3000
   maxSteeringAngle: 90
   maxSpeedMetersPerSecond: 20
+  ActiveWaypoint: {fileID: 0}
   extremumSlip: 0.2
   extremumValue: 1
   asymptoteSlip: 0.5
@@ -1953,6 +1954,7 @@ MonoBehaviour:
     LeftRear: {fileID: 7322804154889787844}
     RightRear: {fileID: 7322804155587791566}
     VehicleRigidBody: {fileID: 7322804155382567614}
+  Mobile: 1
 --- !u!1 &7322804155469052532
 GameObject:
   m_ObjectHideFlags: 0

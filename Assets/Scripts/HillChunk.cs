@@ -25,18 +25,25 @@ public class HillChunk : MonoBehaviour
 
     public event ChunkPassedEventHandler ChunkPassed;
 
+    [SerializeField]
+    private ParkedCar[] parkedCars;
+
     // Start is called before the first frame update
     void Start()
     {
         EntryTrigger.ChunkEntered += HandleChunkEnter;
         ExitTrigger.ChunkExited += HandleChunkExit;
+        parkedCars = GetComponentsInChildren<ParkedCar>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void CycleObstacles()
     {
-        
+        foreach(var p in parkedCars)
+        {
+            p.Cycle();
+        }
     }
+
     protected virtual void OnChunkPassed(ChunkPassedEventArgs e)
     {
         ChunkPassedEventHandler handler = ChunkPassed;

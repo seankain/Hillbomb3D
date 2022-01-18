@@ -87,6 +87,7 @@ public class ChunkCycler : MonoBehaviour
         //WaterPlane.transform.position = new Vector3(WaterPlane.transform.position.x, minChunkEnd.y - WaterPlaneOffset, WaterPlane.transform.position.z);
         MoveObstacles(chunk, dist);
         StartCoroutine(LowerWaterPlane());
+        chunk.CycleObstacles();
     }
 
     Vector3 FindMinChunkEnd()

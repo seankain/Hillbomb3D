@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class BoardController : MonoBehaviour
 {
+    public event EventHandler PlayerBailed;
+    public event EventHandler PlayerRespawned;
+
     public bool Grounded = false;
     public Vector3 LevelDirection = Vector3.forward;
     public Vector3 SurfaceAngleEuler = Vector3.zero;
@@ -18,6 +21,7 @@ public class BoardController : MonoBehaviour
     public float PushCooldown = 1.0f;
     public Vector3 OlliePopForce = new Vector3(0, 10, 0);
     public Vector3 PushForce = new Vector3(0, 0, 10);
+    public Vector3 DownwardForce = new Vector3(0, -1, 0);
     public GameObject Deck;
     public float MaxLeanZ = 10f;
     public float MaxLeanY = 10f;
@@ -25,6 +29,8 @@ public class BoardController : MonoBehaviour
 
     [SerializeField]
     private CharacterState characterState;
+    private Transform characterBoardPosition;
+    private Transform characterParent;
 
     private Rigidbody rb;
 
@@ -43,13 +49,30 @@ public class BoardController : MonoBehaviour
     private float turnTime = 0;
     private bool ollieStarted = false;
     private float lastJump = 0;
+    private bool bailed = false;
+    private float bailTime = 5f;
+    private float bailElapsed = 0f;
 
+
+    protected virtual void OnPlayerBailed(EventArgs e)
+    {
+        EventHandler handler = PlayerBailed;
+        handler?.Invoke(this, e);
+    }
+
+    protected virtual void OnPlayerRespawned(EventArgs e)
+    {
+        EventHandler handler = PlayerRespawned;
+        handler?.Invoke(this, e);
+    }
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         OriginalPosition = this.transform.position;
+        characterBoardPosition = characterState.gameObject.transform;
+        characterParent = characterState.gameObject.transform;
     }
 
     // Update is called once per frame
@@ -59,6 +82,7 @@ public class BoardController : MonoBehaviour
         {
             Respawn();
         }
+        if (bailed) { bailElapsed += Time.deltaTime; if(bailElapsed >= bailTime) { Respawn(); } }
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
         var jump = Input.GetAxis("Jump");
@@ -260,16 +284,51 @@ public class BoardController : MonoBehaviour
             }
         }
         rb.AddForce(acc);
+        rb.AddForce(DownwardForce);
+    }
+
+    private void Bail()
+    {
+        characterState.gameObject.transform.parent = null;
+
+        characterState.anim.SetTrigger("KnockedOff");
+        bailed = true;
+    }
+
+    private void Respawn()
+    {
+        bailed = false;
+        bailElapsed = 0f;
+
+        var respawn = GameObject.FindGameObjectsWithTag("Respawn")[0];
+        characterState.gameObject.transform.parent = characterParent;
+        characterState.gameObject.transform.SetPositionAndRotation(characterBoardPosition.position, characterBoardPosition.rotation);
+        this.transform.position = respawn.transform.position;
+        this.transform.rotation = Quaternion.identity;
+        rb.velocity = Vector3.zero;
+        
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.collider.gameObject.tag == "RidingSurface") { return; }
+        Debug.Log($"Player hitting {collision.collider.name} at {collision.relativeVelocity}");
+        if(Mathf.Abs(collision.relativeVelocity.magnitude) > 20)
+        {
+            Bail();
+        }
     }
 
     private void OnCollisionStay(Collision collision)
     {
         Grounded = collision.gameObject.tag == "RidingSurface";
-        //var contacts = new ContactPoint[collision.contactCount];
-        //collision.GetContacts(contacts);
-        SurfaceAngleEuler = collision.gameObject.transform.rotation.eulerAngles;
-
-
+        if (Grounded)
+        {
+            //var contacts = new ContactPoint[collision.contactCount];
+            //collision.GetContacts(contacts);
+            SurfaceAngleEuler = collision.gameObject.transform.rotation.eulerAngles;
+            gameObject.transform.rotation = Quaternion.Euler(new Vector3(SurfaceAngleEuler.x,gameObject.transform.rotation.eulerAngles.y,gameObject.transform.rotation.eulerAngles.z));
+        }
     }
 
     private void OnCollisionExit(Collision collision)
@@ -279,13 +338,7 @@ public class BoardController : MonoBehaviour
         };
     }
 
-    private void Respawn()
-    {
-        var respawn = GameObject.FindGameObjectsWithTag("Respawn")[0];
-        this.transform.position = respawn.transform.position;
-        this.transform.rotation = Quaternion.identity;
-        rb.velocity = Vector3.zero;
-    }
+
 
 
 
