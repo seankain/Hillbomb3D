@@ -3,9 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+public delegate void BailEventHandler(object sender,BailEventArgs e);
 public class BoardController : MonoBehaviour
 {
-    public event EventHandler PlayerBailed;
+    public event BailEventHandler PlayerBailed;
     public event EventHandler PlayerRespawned;
 
     public bool Grounded = false;
@@ -54,9 +56,9 @@ public class BoardController : MonoBehaviour
     private float bailElapsed = 0f;
 
 
-    protected virtual void OnPlayerBailed(EventArgs e)
+    protected virtual void OnPlayerBailed(BailEventArgs e)
     {
-        EventHandler handler = PlayerBailed;
+        BailEventHandler handler = PlayerBailed;
         handler?.Invoke(this, e);
     }
 
@@ -292,6 +294,8 @@ public class BoardController : MonoBehaviour
         characterState.gameObject.transform.parent = null;
 
         characterState.anim.SetTrigger("KnockedOff");
+        var ragdoll = GetComponentInChildren<RagdollSpawner>().Spawn();
+        PlayerBailed.Invoke(this,new BailEventArgs {  RagdollInstance = ragdoll });
         bailed = true;
     }
 
@@ -342,4 +346,9 @@ public class BoardController : MonoBehaviour
 
 
 
+}
+
+public class BailEventArgs: EventArgs
+{
+    public GameObject RagdollInstance;
 }

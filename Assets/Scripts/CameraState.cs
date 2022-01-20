@@ -22,9 +22,9 @@ public class CameraState : MonoBehaviour
         chaseCamera.ChaseObject = boardController.gameObject;
     }
 
-    private void BoardController_PlayerBailed(object sender, System.EventArgs e)
+    private void BoardController_PlayerBailed(object sender, BailEventArgs e)
     {
-        chaseCamera.ChaseObject = characterState.gameObject;
+        chaseCamera.ChaseObject = e.RagdollInstance;
     }
 
 
