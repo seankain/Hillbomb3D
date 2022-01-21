@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 2035111234}
-  m_IndirectSpecularColor: {r: 190.57066, g: 580.0766, b: 742.7056, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -4391,7 +4391,7 @@ GameObject:
   - component: {fileID: 158972609}
   m_Layer: 10
   m_Name: street (4)
-  m_TagString: Untagged
+  m_TagString: RidingSurface
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7470,6 +7470,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 314962390}
+  - component: {fileID: 314962391}
   m_Layer: 9
   m_Name: Character
   m_TagString: Untagged
@@ -7492,6 +7493,20 @@ Transform:
   m_Father: {fileID: 280517427}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &314962391
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 314962389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef228b3155b803349875897490bb8ab8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RagdollPrefab: {fileID: 8206239567678949622, guid: fc754513dd483784298d32c2969ceee5, type: 3}
+  Player: {fileID: 395292068}
 --- !u!1001 &322462372
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8535,7 +8550,7 @@ GameObject:
   - component: {fileID: 370239718}
   m_Layer: 10
   m_Name: street (8)
-  m_TagString: Untagged
+  m_TagString: RidingSurface
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -20765,7 +20780,7 @@ GameObject:
   - component: {fileID: 1053869014}
   m_Layer: 10
   m_Name: street (14)
-  m_TagString: Untagged
+  m_TagString: RidingSurface
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -21587,7 +21602,7 @@ GameObject:
   - component: {fileID: 1092261451}
   m_Layer: 10
   m_Name: street (10)
-  m_TagString: Untagged
+  m_TagString: RidingSurface
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -23064,7 +23079,7 @@ GameObject:
   - component: {fileID: 1153163242}
   m_Layer: 10
   m_Name: street (9)
-  m_TagString: Untagged
+  m_TagString: RidingSurface
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -25003,7 +25018,7 @@ GameObject:
   - component: {fileID: 1250299711}
   m_Layer: 10
   m_Name: street (12)
-  m_TagString: Untagged
+  m_TagString: RidingSurface
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -26054,7 +26069,7 @@ GameObject:
   - component: {fileID: 1291750073}
   m_Layer: 10
   m_Name: street (11)
-  m_TagString: Untagged
+  m_TagString: RidingSurface
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -28568,7 +28583,7 @@ GameObject:
   - component: {fileID: 1394455003}
   m_Layer: 10
   m_Name: street (7)
-  m_TagString: Untagged
+  m_TagString: RidingSurface
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -30477,7 +30492,7 @@ GameObject:
   - component: {fileID: 1535275953}
   m_Layer: 10
   m_Name: street (6)
-  m_TagString: Untagged
+  m_TagString: RidingSurface
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -30942,7 +30957,7 @@ GameObject:
   - component: {fileID: 1552566686}
   m_Layer: 10
   m_Name: street (3)
-  m_TagString: Untagged
+  m_TagString: RidingSurface
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -35501,6 +35516,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 3760910120216678258, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
+      propertyPath: m_TagString
+      value: RidingSurface
+      objectReference: {fileID: 0}
     - target: {fileID: 3763537829114042268, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
       propertyPath: m_LocalPosition.x
       value: -2.07
@@ -35740,6 +35759,10 @@ PrefabInstance:
     - target: {fileID: 5260892237730276156, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
       propertyPath: m_LocalPosition.z
       value: 11.884384
+      objectReference: {fileID: 0}
+    - target: {fileID: 5260902777582005893, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5260970714073910311, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
       propertyPath: m_LocalPosition.x
@@ -36105,6 +36128,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 5262997917753979464, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
+      propertyPath: m_TagString
+      value: RidingSurface
+      objectReference: {fileID: 0}
     - target: {fileID: 5262997918168534978, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
       propertyPath: m_Layer
       value: 10
@@ -36157,21 +36184,41 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 5263342225564765129, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
+      propertyPath: m_TagString
+      value: RidingSurface
+      objectReference: {fileID: 0}
     - target: {fileID: 5263342225728985546, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
       propertyPath: m_Layer
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5263342225728985546, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
+      propertyPath: m_TagString
+      value: RidingSurface
       objectReference: {fileID: 0}
     - target: {fileID: 5263342226131629828, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
       propertyPath: m_Layer
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 5263342226131629828, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
+      propertyPath: m_TagString
+      value: RidingSurface
+      objectReference: {fileID: 0}
     - target: {fileID: 5263342226262851604, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
       propertyPath: m_Layer
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 5263342226262851604, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
+      propertyPath: m_TagString
+      value: RidingSurface
+      objectReference: {fileID: 0}
     - target: {fileID: 5263342226284018153, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
       propertyPath: m_Layer
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5263342226284018153, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
+      propertyPath: m_TagString
+      value: RidingSurface
       objectReference: {fileID: 0}
     - target: {fileID: 5263342226336051800, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
       propertyPath: m_Layer
@@ -36185,9 +36232,17 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 5263342226408177111, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
+      propertyPath: m_TagString
+      value: RidingSurface
+      objectReference: {fileID: 0}
     - target: {fileID: 5263342226910234938, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
       propertyPath: m_Layer
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5263342226910234938, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
+      propertyPath: m_TagString
+      value: RidingSurface
       objectReference: {fileID: 0}
     - target: {fileID: 5263344961548843547, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
       propertyPath: m_Layer
@@ -36197,6 +36252,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 5263344962542542536, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
+      propertyPath: m_TagString
+      value: RidingSurface
+      objectReference: {fileID: 0}
     - target: {fileID: 5263379052816985232, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
       propertyPath: m_Layer
       value: 10
@@ -36204,6 +36263,10 @@ PrefabInstance:
     - target: {fileID: 5263379053507682600, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
       propertyPath: m_Layer
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5263379053507682600, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
+      propertyPath: m_TagString
+      value: RidingSurface
       objectReference: {fileID: 0}
     - target: {fileID: 5263379053784181449, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
       propertyPath: m_Layer
@@ -36232,6 +36295,10 @@ PrefabInstance:
     - target: {fileID: 5263480787674320117, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
       propertyPath: m_Layer
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5263480787674320117, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
+      propertyPath: m_TagString
+      value: RidingSurface
       objectReference: {fileID: 0}
     - target: {fileID: 5263480787718226816, guid: bb3ba60b8eef4094e919e811e2571b31, type: 3}
       propertyPath: m_Layer
@@ -40224,7 +40291,7 @@ GameObject:
   - component: {fileID: 1975358184}
   m_Layer: 10
   m_Name: street (13)
-  m_TagString: Untagged
+  m_TagString: RidingSurface
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -41224,7 +41291,7 @@ GameObject:
   - component: {fileID: 2027092876}
   m_Layer: 10
   m_Name: street (5)
-  m_TagString: Untagged
+  m_TagString: RidingSurface
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

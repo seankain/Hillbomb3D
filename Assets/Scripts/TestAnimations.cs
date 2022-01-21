@@ -10,6 +10,7 @@ public class TestAnimations : MonoBehaviour
     public Button KnockDownButton;
     public Toggle PushingToggle;
     public Slider SpeedSlider;
+    public CharacterState characterState;
 
     // Start is called before the first frame update
     void Start()
@@ -33,10 +34,12 @@ public class TestAnimations : MonoBehaviour
 
     IEnumerator KnockdownPlayer()
     {
-        PlayerAnimator.SetTrigger("KnockedOff");
-        yield return new WaitForSeconds(2);
-        PlayerAnimator.ResetTrigger("KnockedOff");
-        PlayerAnimator.Play("Pushing");
+        characterState.Bail();
+        //PlayerAnimator.SetTrigger("KnockedOff");
+        yield return new WaitForSeconds(5);
+        characterState.Respawn();
+        //PlayerAnimator.ResetTrigger("KnockedOff");
+       // PlayerAnimator.Play("Pushing");
     }
 
 }

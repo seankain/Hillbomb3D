@@ -9,6 +9,7 @@ public class CharacterState : MonoBehaviour
     public Rigidbody rb;
     public Transform FrontBoltPosition;
     public Transform RearBoltPosition;
+    private Collider playerCollider;
 
     public Vector3 FrontBoltVec;
     public Vector3 RearBoltVec;
@@ -18,7 +19,8 @@ public class CharacterState : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        playerCollider = GetComponent<CapsuleCollider>();
+        SetRagdoll(false);
     }
 
     // Update is called once per frame
@@ -40,11 +42,31 @@ public class CharacterState : MonoBehaviour
     public void Bail() 
     {
         bailed = true;
+        SetRagdoll(true);
     }
 
     public void Respawn()
     {
         bailed = false;
+        SetRagdoll(false);
+    }
+
+    private void SetRagdoll(bool ragdollActivated)
+    {
+        var colliders = GetComponentsInChildren<Collider>(true);
+        playerCollider.enabled = !ragdollActivated;
+        anim.enabled = !ragdollActivated;
+        rb.velocity = Vector3.zero;
+        rb.isKinematic = ragdollActivated;
+        foreach (var collider in colliders)
+        {
+            if (collider != playerCollider)
+            {
+                collider.isTrigger = !ragdollActivated;
+                collider.attachedRigidbody.isKinematic = !ragdollActivated;
+                collider.attachedRigidbody.velocity = Vector3.zero;
+            }
+        }
     }
 
     void OnAnimatorIK(int layerIndex)
