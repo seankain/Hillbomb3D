@@ -145,7 +145,7 @@ public class NpcVehicle : MonoBehaviour
         // Both redlight and obstruction, return closer
         if (obstruction && activeTrafficLight != null)
         {
-            Debug.Log($"{gameObject.name} seeing {hit.collider.gameObject.name}");
+            //Debug.Log($"{gameObject.name} seeing {hit.collider.gameObject.name}");
             return Mathf.Min(Vector3.Distance(gameObject.transform.position, activeTrafficLight.gameObject.transform.position),
                 Vector3.Distance(gameObject.transform.position, hit.transform.position));
         }
@@ -285,7 +285,7 @@ public class NpcVehicle : MonoBehaviour
                 //start at top of next chunk like normal
                 ActiveWaypoint = CurrentChunk.InboundTopWaypoint;
             }
-            Debug.Log($"{name} entered chunk start for {CurrentChunk} going to {ActiveWaypoint}");
+            //Debug.Log($"{name} entered chunk start for {CurrentChunk} going to {ActiveWaypoint}");
         }
         if(other.gameObject.tag == "ChunkEnd")
         {
@@ -305,11 +305,11 @@ public class NpcVehicle : MonoBehaviour
                 }
                 else {
                     gameObject.SetActive(false);
-                    Debug.Log("No neighbor chunk, just go inactive and prepare for recycling");
+                    //Debug.Log("No neighbor chunk, just go inactive and prepare for recycling");
                 }
                 
             }
-            Debug.Log($"{name} entered chunk start for {CurrentChunk} going to {ActiveWaypoint}");
+            //Debug.Log($"{name} entered chunk start for {CurrentChunk} going to {ActiveWaypoint}");
         }
     }
 

@@ -74,7 +74,8 @@ public class BoardController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         OriginalPosition = this.transform.position;
         characterBoardPosition = characterState.gameObject.transform;
-        characterParent = characterState.gameObject.transform;
+        characterParent = characterState.gameObject.transform.parent.transform;
+        characterState.Respawn();
     }
 
     // Update is called once per frame
@@ -215,7 +216,6 @@ public class BoardController : MonoBehaviour
             startRotation = originalRotation;
         }
 
-        Debug.Log(startRotation);
         //float endRotation = startRotation + rot;
         float endRotation = rot;
         float t = duration;
@@ -230,34 +230,6 @@ public class BoardController : MonoBehaviour
         }
     }
 
-    private IEnumerator PowerSlide()
-    {
-        if (backsideSlide)
-        {
-            while (gameObject.transform.rotation.eulerAngles != powerSlideRotation)
-            {
-                gameObject.transform.rotation = Quaternion.Euler(Vector3.MoveTowards(gameObject.transform.rotation.eulerAngles, powerSlideRotation, PowerSlideSpeed * Time.deltaTime));
-                yield return null;
-            }
-        }
-        else if (frontsideSlide)
-        {
-            while (gameObject.transform.rotation.eulerAngles != powerSlideRotation)
-            {
-                gameObject.transform.rotation = Quaternion.Euler(Vector3.MoveTowards(gameObject.transform.rotation.eulerAngles, -powerSlideRotation, PowerSlideSpeed * Time.deltaTime));
-                yield return null;
-            }
-        }
-    }
-
-    private IEnumerator StopPowerSlide()
-    {
-        while (gameObject.transform.rotation.eulerAngles != Vector3.zero)
-        {
-            gameObject.transform.rotation = Quaternion.Euler(Vector3.MoveTowards(gameObject.transform.rotation.eulerAngles,Vector3.zero, PowerSlideSpeed * Time.deltaTime));
-            yield return null;
-        }
-    }
 
     private void FixedUpdate()
     {
@@ -275,7 +247,6 @@ public class BoardController : MonoBehaviour
         {
             if(pushTimer == 0)
             {
-                Debug.Log("pushing");
                 rb.AddForce(PushForce,ForceMode.VelocityChange);
             }
             pushTimer += Time.deltaTime;
@@ -293,9 +264,10 @@ public class BoardController : MonoBehaviour
     {
         characterState.gameObject.transform.parent = null;
 
-        characterState.anim.SetTrigger("KnockedOff");
-        var ragdoll = GetComponentInChildren<RagdollSpawner>().Spawn();
-        PlayerBailed.Invoke(this,new BailEventArgs {  RagdollInstance = ragdoll });
+        //characterState.anim.SetTrigger("KnockedOff");
+        //var ragdoll = GetComponentInChildren<RagdollSpawner>().Spawn();
+        characterState.Bail();
+        PlayerBailed.Invoke(this,new BailEventArgs {  RagdollInstance = characterState.gameObject });
         bailed = true;
     }
 
@@ -303,20 +275,23 @@ public class BoardController : MonoBehaviour
     {
         bailed = false;
         bailElapsed = 0f;
-
+        characterState.Respawn();
         var respawn = GameObject.FindGameObjectsWithTag("Respawn")[0];
         characterState.gameObject.transform.parent = characterParent;
-        characterState.gameObject.transform.SetPositionAndRotation(characterBoardPosition.position, characterBoardPosition.rotation);
+        characterState.gameObject.transform.SetPositionAndRotation(Vector3.zero, Quaternion.Euler(0,90,0));
+        //characterState.gameObject.transform.SetPositionAndRotation(characterBoardPosition.position, characterBoardPosition.rotation);
+        PlayerRespawned.Invoke(this, new EventArgs());
         this.transform.position = respawn.transform.position;
         this.transform.rotation = Quaternion.identity;
         rb.velocity = Vector3.zero;
+
         
     }
 
     private void OnCollisionEnter(Collision collision)
     {
         if(collision.collider.gameObject.tag == "RidingSurface") { return; }
-        Debug.Log($"Player hitting {collision.collider.name} at {collision.relativeVelocity}");
+        //Debug.Log($"Player hitting {collision.collider.name} at {collision.relativeVelocity}");
         if(Mathf.Abs(collision.relativeVelocity.magnitude) > 20)
         {
             Bail();

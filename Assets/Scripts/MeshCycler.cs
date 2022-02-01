@@ -19,6 +19,11 @@ public class MeshCycler : MonoBehaviour
     [SerializeField]
     private bool Mobile = true;
 
+    private void Start()
+    {
+        ActiveBodyMesh = Meshes[0];
+    }
+
     public void SetActiveMesh(int index)
     {
         if(index < 0 || index > Meshes.Length - 1)
@@ -62,11 +67,9 @@ public class MeshCycler : MonoBehaviour
     private void SetRandomBodyMaterial()
     {
         var mat = BodyMaterials[Random.Range(0, BodyMaterials.Length)];
-        var materials = ActiveBodyMesh.BodyMesh.GetComponent<MeshRenderer>().materials;
+        var materials = ActiveBodyMesh.BodyMesh.GetComponent<MeshRenderer>().sharedMaterials;
         materials[ActiveBodyMesh.SwapMaterialPostition] = mat;
         ActiveBodyMesh.BodyMesh.GetComponent<MeshRenderer>().materials = materials;
-        //ActiveBodyMesh.BodyMesh.GetComponent<MeshRenderer>().materials[ActiveBodyMesh.SwapMaterialPostition] = mat;
-        Debug.Log(ActiveBodyMesh.BodyMesh.GetComponent<MeshRenderer>().materials[ActiveBodyMesh.SwapMaterialPostition]);
     }
 
 }

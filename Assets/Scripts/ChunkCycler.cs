@@ -13,6 +13,7 @@ public class ChunkCycler : MonoBehaviour
     private List<HillChunk> FrontPool;
     private List<HillChunk> PassedPool;
     public GameObject Player;
+    private BoardController playerController;
 
     // Start is called before the first frame update
     void Start()
@@ -20,6 +21,48 @@ public class ChunkCycler : MonoBehaviour
         FrontPool = new List<HillChunk>();
         PassedPool = new List<HillChunk>();
         FrontPool.AddRange(ChunkPool);
+        playerController = Player.GetComponent<BoardController>();
+        playerController.PlayerRespawned += ChunkCycler_PlayerRespawned;
+    }
+
+    private void ChunkCycler_PlayerRespawned(object sender, System.EventArgs e)
+    {
+        ResetChunks();
+    }
+
+    /// <summary>
+    /// Put the chunks back in an order where the respawn chunk is at the top. Before if the respawn chunk was last there would be no transition chunk in front and they would
+    /// start to pop up at the player on chunk exit
+    /// </summary>
+    private void ResetChunks()
+    {
+        HillChunk respawnChunk = null;
+        List<HillChunk> contentChunks = new List<HillChunk>();
+        foreach (var chunk in ChunkPool)
+        {
+            if (chunk.IsRespawnChunk)
+            {
+                respawnChunk = chunk;
+                var pos = chunk.gameObject.transform.position;
+                var distance = Vector3.Distance(pos, Vector3.zero);
+                chunk.transform.position -= pos;
+                chunk.CycleObstacles();
+                chunk.Occupied = true;
+            }
+            else
+            {
+                contentChunks.Add(chunk);
+            }
+        }
+        var chunkEndPos = respawnChunk.ChunkEnd.transform.position;
+        foreach(var contentChunk in contentChunks)
+        {
+            MoveChunkToPosition(contentChunk,chunkEndPos);
+            chunkEndPos = contentChunk.ChunkEnd.transform.position;
+            contentChunk.Occupied = false;
+            contentChunk.Passed = false;
+        }
+
     }
 
     // Update is called once per frame
@@ -81,6 +124,18 @@ public class ChunkCycler : MonoBehaviour
     {
         var minChunkEnd = FindMinChunkEnd();
         var dist = chunk.ChunkStart.transform.position - minChunkEnd;
+        chunk.transform.position = (chunk.transform.position - dist);
+        //Debug.Log($"Moving {chunk.name} to  {chunk.transform.position}");
+        chunk.Passed = false;
+        //WaterPlane.transform.position = new Vector3(WaterPlane.transform.position.x, minChunkEnd.y - WaterPlaneOffset, WaterPlane.transform.position.z);
+        MoveObstacles(chunk, dist);
+        StartCoroutine(LowerWaterPlane());
+        chunk.CycleObstacles();
+    }
+
+    void MoveChunkToPosition(HillChunk chunk, Vector3 position)
+    {
+        var dist = chunk.ChunkStart.transform.position - position;
         chunk.transform.position = (chunk.transform.position - dist);
         //Debug.Log($"Moving {chunk.name} to  {chunk.transform.position}");
         chunk.Passed = false;

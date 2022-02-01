@@ -14,6 +14,7 @@ public class HillChunk : MonoBehaviour
     public bool IsPositionResetChunk;
     public bool Passed = false;
     public bool Occupied = false;
+    public bool IsRespawnChunk = false;
 
     public ChunkTrigger EntryTrigger;
     public ChunkTrigger ExitTrigger;

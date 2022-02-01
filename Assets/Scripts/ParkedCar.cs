@@ -10,7 +10,6 @@ public class ParkedCar : MonoBehaviour
 
     public void Cycle()
     {
-        Debug.Log($"Occupado {occupado.Occupied}");
         if(Random.value > 0.5 && occupado.Occupied == false)
         {
             meshCycler.SetRandomMesh();

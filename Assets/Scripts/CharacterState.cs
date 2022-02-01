@@ -20,6 +20,7 @@ public class CharacterState : MonoBehaviour
     void Start()
     {
         playerCollider = GetComponent<CapsuleCollider>();
+        rb = GetComponent<Rigidbody>();
         SetRagdoll(false);
     }
 
