@@ -3,12 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
-//public delegate void BailEventHandler(object sender,BailEventArgs e);
-public class BoardController : MonoBehaviour
+public class BotRiderController : BoardControllerBase
 {
-    public event BailEventHandler PlayerBailed;
-    public event EventHandler PlayerRespawned;
+    //public event BailEventHandler PlayerBailed;
+    //public event EventHandler PlayerRespawned;
 
     public bool Grounded = false;
     public Vector3 LevelDirection = Vector3.forward;
@@ -54,46 +52,52 @@ public class BoardController : MonoBehaviour
     private bool bailed = false;
     private float bailTime = 5f;
     private float bailElapsed = 0f;
+    private PlayerInput playerInput;
 
-
-    protected virtual void OnPlayerBailed(BailEventArgs e)
+    protected override void OnPlayerBailed(BailEventArgs e)
     {
-        BailEventHandler handler = PlayerBailed;
-        handler?.Invoke(this, e);
+        base.OnPlayerBailed(e);
     }
 
-    protected virtual void OnPlayerRespawned(EventArgs e)
+    protected override void OnPlayerRespawned(EventArgs e)
     {
-        EventHandler handler = PlayerRespawned;
-        handler?.Invoke(this, e);
+        base.OnPlayerRespawned(e);
+    }
+
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+        playerInput = GetComponent<PlayerInput>();
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
+
         OriginalPosition = this.transform.position;
+        playerInput = GetComponent<PlayerInput>();
         characterBoardPosition = characterState.gameObject.transform;
         characterParent = characterState.gameObject.transform.parent.transform;
         characterState.Respawn();
+        gameObject.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetAxis("Respawn") > 0)
+        if (Input.GetAxis("Respawn") > 0)
         {
             Respawn();
         }
-        if (bailed) { bailElapsed += Time.deltaTime; if(bailElapsed >= bailTime) { Respawn(); } }
-        horizontal = Input.GetAxis("Horizontal");
-        vertical = Input.GetAxis("Vertical");
-        var jump = Input.GetAxis("Jump");
+        if (bailed) { bailElapsed += Time.deltaTime; if (bailElapsed >= bailTime) { Respawn(); } }
+        horizontal = playerInput.Horizontal;
+        vertical = playerInput.Vertical;
+        var jump = playerInput.Jump;
         characterState.Grounded = Grounded;
         if (jump > 0) { ollieStarted = true; }
         if (jump < lastJump && ollieStarted && Grounded)
         {
-            if(!isPowerSliding)
+            if (!isPowerSliding)
             {
                 Ollie();
             }
@@ -107,31 +111,31 @@ public class BoardController : MonoBehaviour
             pushing = true;
         }
         // Holding back on vertical and turning signals an intentional powerslide
-        if (vertical < 0 && horizontal !=0 && !isPowerSliding)
+        if (vertical < 0 && horizontal != 0 && !isPowerSliding)
         {
-  
+
             backsideSlide = horizontal > 0;
             frontsideSlide = horizontal < 0;
             isPowerSliding = true;
             if (backsideSlide)
             {
-           
+
                 // StartCoroutine(Rotate(0.2f, 90f));
                 SkateboardAnimator.SetBool("BacksidePowerslide", true);
 
             }
             else if (frontsideSlide)
-            {   
-         
+            {
+
                 //   StartCoroutine(Rotate(0.2f, -90f));
                 SkateboardAnimator.SetBool("FrontsidePowerslide", true);
             }
 
         }
-        else if(vertical == 0)
+        else if (vertical == 0)
         {
             //once player is powersliding, they can stop by letting go on vertical
-            if (isPowerSliding) 
+            if (isPowerSliding)
             {
                 isPowerSliding = false;
                 if (backsideSlide)
@@ -160,7 +164,7 @@ public class BoardController : MonoBehaviour
 
         }
 
-      
+
     }
 
     private void Ollie()
@@ -170,16 +174,16 @@ public class BoardController : MonoBehaviour
         rb.AddForce(OlliePopForce);
     }
 
-    private IEnumerator UnLean(float directionY,float directionZ,float duration = 0.1f)
+    private IEnumerator UnLean(float directionY, float directionZ, float duration = 0.1f)
     {
         var startLean = transform.rotation.eulerAngles;
-        var endLean = new Vector3(startLean.x,0,0);
+        var endLean = new Vector3(startLean.x, 0, 0);
         float t = 0.0f;
         while (t < duration)
         {
             t += Time.deltaTime;
             //Debug.Log($"{t}/{duration} = {t/duration}");
-            var increment = Vector3.Lerp(startLean, endLean,t);
+            var increment = Vector3.Lerp(startLean, endLean, t);
             //float yRotation = Mathf.Lerp(startRotation, endRotation, t / duration);
             transform.rotation = Quaternion.Euler(increment);
             //Debug.Log($"{t/duration} {transform.rotation.eulerAngles}");
@@ -187,7 +191,7 @@ public class BoardController : MonoBehaviour
         }
     }
 
-    private IEnumerator Rotate(float duration,float rot, float originalRotation = Mathf.NegativeInfinity)
+    private IEnumerator Rotate(float duration, float rot, float originalRotation = Mathf.NegativeInfinity)
     {
         float startRotation = transform.eulerAngles.y;
         if (originalRotation != Mathf.NegativeInfinity)
@@ -208,7 +212,7 @@ public class BoardController : MonoBehaviour
         }
     }
 
-    private IEnumerator RotateReverse(float duration,float rot,float originalRotation=Mathf.NegativeInfinity)
+    private IEnumerator RotateReverse(float duration, float rot, float originalRotation = Mathf.NegativeInfinity)
     {
         float startRotation = transform.eulerAngles.y;
         if (originalRotation != Mathf.NegativeInfinity)
@@ -219,7 +223,7 @@ public class BoardController : MonoBehaviour
         //float endRotation = startRotation + rot;
         float endRotation = rot;
         float t = duration;
-        while (t>0)
+        while (t > 0)
         {
             t -= Time.deltaTime;
             //Debug.Log($"{t}/{duration} = {t/duration}");
@@ -235,7 +239,7 @@ public class BoardController : MonoBehaviour
     {
         var acc = ArbitraryConstant * (LevelDirection * (2f / 3f) * 9.8f * Mathf.Sin(radConvert * SurfaceAngleEuler.x));
         // var turnForce = (TurnForceConstant * rb.velocity.magnitude + turnTime) * Vector3.right * horizontal;
-        var turnForce =  TurnForceConstant * rb.velocity.z * Vector3.right * horizontal;
+        var turnForce = TurnForceConstant * rb.velocity.z * Vector3.right * horizontal;
         //Debug.Log(acc);
         //Debug.Log(turnForce);
         //Debug.Log(Vector3.Cross(acc, turnForce));
@@ -245,12 +249,12 @@ public class BoardController : MonoBehaviour
         }
         if (pushing)
         {
-            if(pushTimer == 0)
+            if (pushTimer == 0)
             {
-                rb.AddForce(PushForce,ForceMode.VelocityChange);
+                rb.AddForce(PushForce, ForceMode.VelocityChange);
             }
             pushTimer += Time.deltaTime;
-            if(pushTimer >= PushCooldown)
+            if (pushTimer >= PushCooldown)
             {
                 pushing = false;
                 pushTimer = 0;
@@ -267,32 +271,34 @@ public class BoardController : MonoBehaviour
         //characterState.anim.SetTrigger("KnockedOff");
         //var ragdoll = GetComponentInChildren<RagdollSpawner>().Spawn();
         characterState.Bail();
-        PlayerBailed.Invoke(this,new BailEventArgs {  RagdollInstance = characterState.gameObject });
+        OnPlayerBailed(new BailEventArgs { RagdollInstance = characterState.gameObject });
+        //PlayerBailed.Invoke(this, new BailEventArgs { RagdollInstance = characterState.gameObject });
         bailed = true;
     }
 
-    private void Respawn()
+    public void Respawn()
     {
         bailed = false;
         bailElapsed = 0f;
+        rb.velocity = Vector3.zero;
         characterState.Respawn();
         var respawn = GameObject.FindGameObjectsWithTag("Respawn")[0];
         characterState.gameObject.transform.parent = characterParent;
-        characterState.gameObject.transform.SetPositionAndRotation(Vector3.zero, Quaternion.Euler(0,90,0));
+        characterState.gameObject.transform.SetPositionAndRotation(Vector3.zero, Quaternion.Euler(0, 90, 0));
         //characterState.gameObject.transform.SetPositionAndRotation(characterBoardPosition.position, characterBoardPosition.rotation);
-        PlayerRespawned.Invoke(this, new EventArgs());
         this.transform.position = respawn.transform.position;
         this.transform.rotation = Quaternion.identity;
-        rb.velocity = Vector3.zero;
+        OnPlayerRespawned(new EventArgs());
+        //PlayerRespawned.Invoke(this, new EventArgs());
 
-        
+
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if(collision.collider.gameObject.tag == "RidingSurface") { return; }
+        if (collision.collider.gameObject.tag == "RidingSurface") { return; }
         //Debug.Log($"Player hitting {collision.collider.name} at {collision.relativeVelocity}");
-        if(Mathf.Abs(collision.relativeVelocity.magnitude) > 20)
+        if (Mathf.Abs(collision.relativeVelocity.magnitude) > 20)
         {
             Bail();
         }
@@ -306,15 +312,15 @@ public class BoardController : MonoBehaviour
             //var contacts = new ContactPoint[collision.contactCount];
             //collision.GetContacts(contacts);
             SurfaceAngleEuler = collision.gameObject.transform.rotation.eulerAngles;
-            gameObject.transform.rotation = Quaternion.Euler(new Vector3(SurfaceAngleEuler.x,gameObject.transform.rotation.eulerAngles.y,gameObject.transform.rotation.eulerAngles.z));
+            gameObject.transform.rotation = Quaternion.Euler(new Vector3(SurfaceAngleEuler.x, gameObject.transform.rotation.eulerAngles.y, gameObject.transform.rotation.eulerAngles.z));
         }
     }
 
     private void OnCollisionExit(Collision collision)
     {
-        if (collision.gameObject.tag == "RidingSurface") {
+        if (collision.gameObject.tag == "RidingSurface")
+        {
             Grounded = false;
         };
     }
 }
-

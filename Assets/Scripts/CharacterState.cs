@@ -9,7 +9,7 @@ public class CharacterState : MonoBehaviour
     public Rigidbody rb;
     public Transform FrontBoltPosition;
     public Transform RearBoltPosition;
-    private Collider playerCollider;
+    public Collider playerCollider;
 
     public Vector3 FrontBoltVec;
     public Vector3 RearBoltVec;
@@ -19,7 +19,7 @@ public class CharacterState : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        playerCollider = GetComponent<CapsuleCollider>();
+        //playerCollider = GetComponent<CapsuleCollider>();
         rb = GetComponent<Rigidbody>();
         SetRagdoll(false);
     }

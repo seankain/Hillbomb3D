@@ -13,7 +13,7 @@ public class ChunkCycler : MonoBehaviour
     private List<HillChunk> FrontPool;
     private List<HillChunk> PassedPool;
     public GameObject Player;
-    private BoardController playerController;
+    private BoardControllerBase playerController;
 
     // Start is called before the first frame update
     void Start()
@@ -21,7 +21,7 @@ public class ChunkCycler : MonoBehaviour
         FrontPool = new List<HillChunk>();
         PassedPool = new List<HillChunk>();
         FrontPool.AddRange(ChunkPool);
-        playerController = Player.GetComponent<BoardController>();
+        playerController = Player.GetComponent<BoardControllerBase>();
         playerController.PlayerRespawned += ChunkCycler_PlayerRespawned;
     }
 
@@ -34,7 +34,7 @@ public class ChunkCycler : MonoBehaviour
     /// Put the chunks back in an order where the respawn chunk is at the top. Before if the respawn chunk was last there would be no transition chunk in front and they would
     /// start to pop up at the player on chunk exit
     /// </summary>
-    private void ResetChunks()
+    public void ResetChunks()
     {
         HillChunk respawnChunk = null;
         List<HillChunk> contentChunks = new List<HillChunk>();
