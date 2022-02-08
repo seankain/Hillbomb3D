@@ -53,6 +53,7 @@ public class BotRiderController : BoardControllerBase
     private float bailTime = 5f;
     private float bailElapsed = 0f;
     private PlayerInput playerInput;
+    private PlayerGruntEmitter gruntEmitter;
 
     protected override void OnPlayerBailed(BailEventArgs e)
     {
@@ -68,6 +69,7 @@ public class BotRiderController : BoardControllerBase
     {
         rb = GetComponent<Rigidbody>();
         playerInput = GetComponent<PlayerInput>();
+        gruntEmitter = GetComponent<PlayerGruntEmitter>();
     }
 
     // Start is called before the first frame update
@@ -274,6 +276,7 @@ public class BotRiderController : BoardControllerBase
         OnPlayerBailed(new BailEventArgs { RagdollInstance = characterState.gameObject });
         //PlayerBailed.Invoke(this, new BailEventArgs { RagdollInstance = characterState.gameObject });
         bailed = true;
+        gruntEmitter.PlayRandom();
     }
 
     public void Respawn()

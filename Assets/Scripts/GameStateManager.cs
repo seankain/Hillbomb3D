@@ -36,11 +36,29 @@ public class GameStateManager : MonoBehaviour
     void Start()
     {
         //TransitionToMenu();
+        demoBot.PlayerBailed += DemoBot_PlayerBailed;
         crossFader.FadeOut();
         CurrentState = GameState.Menu;
         AttractModeCamera.gameObject.SetActive(false);
         MenuCamera.gameObject.SetActive(true);
         crossFader.FadeIn();
+        
+    }
+
+    private void DemoBot_PlayerBailed(object sender, BailEventArgs e)
+    {
+        StartCoroutine(BotBailedTransitionCoroutine());
+    }
+
+    private IEnumerator BotBailedTransitionCoroutine()
+    {
+        var elapsed = 0f;
+        while(elapsed < 5f)
+        {
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        TransitionToMenu();
     }
 
     // Update is called once per frame
