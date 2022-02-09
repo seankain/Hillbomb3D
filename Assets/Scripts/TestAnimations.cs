@@ -11,6 +11,12 @@ public class TestAnimations : MonoBehaviour
     public Toggle PushingToggle;
     public Slider SpeedSlider;
     public CharacterState characterState;
+    private PlayerGruntEmitter gruntEmitter;
+
+    private void Awake()
+    {
+        gruntEmitter = characterState.gameObject.GetComponent<PlayerGruntEmitter>();
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -36,6 +42,7 @@ public class TestAnimations : MonoBehaviour
     {
         characterState.Bail();
         //PlayerAnimator.SetTrigger("KnockedOff");
+        gruntEmitter.PlayRandom();
         yield return new WaitForSeconds(5);
         characterState.Respawn();
         //PlayerAnimator.ResetTrigger("KnockedOff");

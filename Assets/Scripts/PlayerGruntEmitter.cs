@@ -13,6 +13,8 @@ public class PlayerGruntEmitter : MonoBehaviour
     {
         var index = UnityEngine.Random.Range(0, clipLocations.Count-1);
         var clipLocation = clipLocations[index];
+        //GruntAudioSource.time = clipLocation.Start;
+        //GruntAudioSource.Play();
         StartCoroutine(PlaySubclip(clipLocation));
     }
 
@@ -21,10 +23,11 @@ public class PlayerGruntEmitter : MonoBehaviour
         GruntAudioSource.time = location.Start;
         GruntAudioSource.Play();
         var elapsed = 0f;
-        while(elapsed < location.Duration)
-        {
-            yield return null;
-        }
+        yield return new WaitForSeconds(location.Duration);
+        //while(elapsed < location.Duration)
+        //{
+        //    yield return null;
+        //}
         GruntAudioSource.Stop();
     }
 
