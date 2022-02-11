@@ -50,7 +50,10 @@ public class ChunkTrigger : MonoBehaviour
     {
         if (other.CompareTag("Player") && TriggerType == ChunkTriggerType.Entry)
         {
-            OnChunkEntered(new ChunkTransitEventArgs());
+            if (!other.GetComponent<BoardControllerBase>().Bailed)
+            {
+                OnChunkEntered(new ChunkTransitEventArgs());
+            }
             //Debug.Log($"Player entering chunk");
         }
     }
@@ -59,7 +62,10 @@ public class ChunkTrigger : MonoBehaviour
     {
         if (other.CompareTag("Player") && TriggerType == ChunkTriggerType.Exit)
         {
-            OnChunkExited(new ChunkTransitEventArgs());
+            if (!other.GetComponent<BoardControllerBase>().Bailed)
+            {
+                OnChunkExited(new ChunkTransitEventArgs());
+            }
             //Debug.Log($"Player exiting chunk");
         }
     }

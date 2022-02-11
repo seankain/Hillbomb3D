@@ -5,10 +5,10 @@ using UnityEngine;
 
 
 //public delegate void BailEventHandler(object sender,BailEventArgs e);
-public class BoardController : MonoBehaviour
+public class BoardController : BoardControllerBase
 {
-    public event BailEventHandler PlayerBailed;
-    public event EventHandler PlayerRespawned;
+    //public event BailEventHandler PlayerBailed;
+    //public event EventHandler PlayerRespawned;
 
     public bool Grounded = false;
     public Vector3 LevelDirection = Vector3.forward;
@@ -51,21 +51,18 @@ public class BoardController : MonoBehaviour
     private float turnTime = 0;
     private bool ollieStarted = false;
     private float lastJump = 0;
-    private bool bailed = false;
+    //private bool bailed = false;
     private float bailTime = 5f;
     private float bailElapsed = 0f;
 
-
-    protected virtual void OnPlayerBailed(BailEventArgs e)
+    protected override void OnPlayerBailed(BailEventArgs e)
     {
-        BailEventHandler handler = PlayerBailed;
-        handler?.Invoke(this, e);
+        base.OnPlayerBailed(e);
     }
 
-    protected virtual void OnPlayerRespawned(EventArgs e)
+    protected override void OnPlayerRespawned(EventArgs e)
     {
-        EventHandler handler = PlayerRespawned;
-        handler?.Invoke(this, e);
+        base.OnPlayerRespawned(e);
     }
 
     // Start is called before the first frame update
@@ -85,7 +82,7 @@ public class BoardController : MonoBehaviour
         {
             Respawn();
         }
-        if (bailed) { bailElapsed += Time.deltaTime; if(bailElapsed >= bailTime) { Respawn(); } }
+        if (Bailed) { bailElapsed += Time.deltaTime; if(bailElapsed >= bailTime) { Respawn(); } return; }
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
         var jump = Input.GetAxis("Jump");
@@ -267,20 +264,22 @@ public class BoardController : MonoBehaviour
         //characterState.anim.SetTrigger("KnockedOff");
         //var ragdoll = GetComponentInChildren<RagdollSpawner>().Spawn();
         characterState.Bail();
-        PlayerBailed.Invoke(this,new BailEventArgs {  RagdollInstance = characterState.gameObject });
-        bailed = true;
+        OnPlayerBailed(new BailEventArgs { RagdollInstance = characterState.gameObject });
+        //PlayerBailed.Invoke(this,new BailEventArgs {  RagdollInstance = characterState.gameObject });
+        Bailed = true;
     }
 
     private void Respawn()
     {
-        bailed = false;
+        Bailed = false;
         bailElapsed = 0f;
         characterState.Respawn();
         var respawn = GameObject.FindGameObjectsWithTag("Respawn")[0];
         characterState.gameObject.transform.parent = characterParent;
         characterState.gameObject.transform.SetPositionAndRotation(Vector3.zero, Quaternion.Euler(0,90,0));
         //characterState.gameObject.transform.SetPositionAndRotation(characterBoardPosition.position, characterBoardPosition.rotation);
-        PlayerRespawned.Invoke(this, new EventArgs());
+        //PlayerRespawned.Invoke(this, new EventArgs());
+        OnPlayerRespawned(new EventArgs());
         this.transform.position = respawn.transform.position;
         this.transform.rotation = Quaternion.identity;
         rb.velocity = Vector3.zero;

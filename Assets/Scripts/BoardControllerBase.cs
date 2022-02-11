@@ -11,6 +11,8 @@ public class BoardControllerBase : MonoBehaviour
     public event BailEventHandler PlayerBailed;
     public event EventHandler PlayerRespawned;
 
+    public bool Bailed = false;
+
     protected virtual void OnPlayerBailed(BailEventArgs e)
     {
         BailEventHandler handler = PlayerBailed;

@@ -17,10 +17,17 @@ public class CharacterState : MonoBehaviour
     public bool Grounded = true;
     private bool bailed = false;
     // Start is called before the first frame update
+
+    private void Awake()
+    {
+        playerCollider = GetComponent<CapsuleCollider>();
+        rb = GetComponent<Rigidbody>();
+    }
+
     void Start()
     {
         //playerCollider = GetComponent<CapsuleCollider>();
-        rb = GetComponent<Rigidbody>();
+        //rb = GetComponent<Rigidbody>();
         SetRagdoll(false);
     }
 
