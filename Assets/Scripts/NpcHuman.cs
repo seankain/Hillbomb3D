@@ -37,7 +37,7 @@ public class NpcHuman : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        navMeshAgent.transform.LookAt(currentDestination);
+       // navMeshAgent.transform.LookAt(currentDestination);
         if (navMeshAgent.remainingDistance < 1)
         {
             navMeshAgent.SetDestination(SelectRandomWayPoint());

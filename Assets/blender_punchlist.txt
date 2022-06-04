@@ -1,9 +1,13 @@
-driveway apron
-curb 
-3 stair
-window pane
-half hexagon bay window
-garage doors
+x driveway apron
+x 2 way corner crossing sidewalk dip
+x curb 
+x 3 stair
+x window pane
+x half hexagon bay window
+x garage doors
 tree/tree planter
+awning
+ground floor stairs
+first story stairs
 
 https://www.google.com/maps/@37.757164,-122.4010165,3a,75y,255.31h,72.29t/data=!3m6!1e1!3m4!1sPpYdyJBZYxV5MVLXtwcQdg!2e0!7i16384!8i8192!5m1!1e4

@@ -188,6 +188,7 @@ public class NpcVehicle : MonoBehaviour
         if (!gameObject.activeSelf) { return; }
         //Player passed by just re-enter the pool
         if (CurrentChunk.Passed) { gameObject.SetActive(false); return; }
+        // probably unrecoverable tipping
         if((Mathf.Abs(gameObject.transform.rotation.eulerAngles.z) >= 90  && Mathf.Abs(gameObject.transform.rotation.eulerAngles.z) <= 270) || (Mathf.Abs(gameObject.transform.rotation.eulerAngles.x) >= 80 ) && Mathf.Abs(gameObject.transform.rotation.eulerAngles.x) <= 270)
         {
             gameObject.SetActive(false);return;
