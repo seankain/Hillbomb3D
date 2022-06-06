@@ -796,7 +796,9 @@ MonoBehaviour:
   Width: 10
   Height: 3.5
   storyPrefabs:
-  - {fileID: 2895560243389468250, guid: 724c67136a3b55247923fb954561fabc, type: 3}
+  - {fileID: 130021244662579469, guid: 86e1ca924391c994c88139d3f14d7118, type: 3}
+  groundFloorFillerPrefabs:
+  - {fileID: 2895560243389468250, guid: 5e657cc1c049ad44a91ee13d48f66e1d, type: 3}
   spawnRules:
   - ComponentType: 0
     ProbabilityReductionRate: 0
