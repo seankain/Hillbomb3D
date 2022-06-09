@@ -797,6 +797,7 @@ MonoBehaviour:
   Height: 3.5
   storyPrefabs:
   - {fileID: 130021244662579469, guid: 86e1ca924391c994c88139d3f14d7118, type: 3}
+  - {fileID: 5407163973434763790, guid: 2802ae102f098b44b96b02df9d8f59b5, type: 3}
   groundFloorFillerPrefabs:
   - {fileID: 2895560243389468250, guid: 5e657cc1c049ad44a91ee13d48f66e1d, type: 3}
   spawnRules:
@@ -3439,3 +3440,60 @@ Transform:
   m_Father: {fileID: 1095494914}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &3206858670596849305
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4867693141587207408, guid: 2802ae102f098b44b96b02df9d8f59b5, type: 3}
+      propertyPath: m_RootOrder
+      value: 23
+      objectReference: {fileID: 0}
+    - target: {fileID: 4867693141587207408, guid: 2802ae102f098b44b96b02df9d8f59b5, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -17.74
+      objectReference: {fileID: 0}
+    - target: {fileID: 4867693141587207408, guid: 2802ae102f098b44b96b02df9d8f59b5, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -4.69
+      objectReference: {fileID: 0}
+    - target: {fileID: 4867693141587207408, guid: 2802ae102f098b44b96b02df9d8f59b5, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -7.12
+      objectReference: {fileID: 0}
+    - target: {fileID: 4867693141587207408, guid: 2802ae102f098b44b96b02df9d8f59b5, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4867693141587207408, guid: 2802ae102f098b44b96b02df9d8f59b5, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4867693141587207408, guid: 2802ae102f098b44b96b02df9d8f59b5, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4867693141587207408, guid: 2802ae102f098b44b96b02df9d8f59b5, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4867693141587207408, guid: 2802ae102f098b44b96b02df9d8f59b5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4867693141587207408, guid: 2802ae102f098b44b96b02df9d8f59b5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4867693141587207408, guid: 2802ae102f098b44b96b02df9d8f59b5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5407163973434763790, guid: 2802ae102f098b44b96b02df9d8f59b5, type: 3}
+      propertyPath: m_Name
+      value: Garage_4m
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 2802ae102f098b44b96b02df9d8f59b5, type: 3}
