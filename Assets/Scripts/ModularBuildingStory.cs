@@ -46,18 +46,18 @@ public class ModularBuildingStory : MonoBehaviour
         while (i < Width)
         {
             var index = GetNextComponent(Width - i, Height);
-            i += storyComponents[index].Width;
             // wanted to use sin(17) since the angle of the level is fixed at 17 degrees but messed around to get 0.297 instead
             var pos = transform.position + direction * i - (new Vector3(0, 0.297f * i, 0));
-            Instantiate(storyPrefabs[index], transform.position + direction * i - (new Vector3(0,0.297f*i,0)),Quaternion.identity,transform);
+            Instantiate(storyPrefabs[index], transform.position + (direction * i - new Vector3((storyComponents[index].Width/2),0,0)) - (new Vector3(0,0.297f*i,0)),Quaternion.identity,transform);
             if (i > storyComponents[index].Width)
             {
-                var filler = Instantiate(groundFloorFillerPrefabs[index], transform.position + direction * i + new Vector3(0,-0.297f*i +Height,0), Quaternion.identity, transform);
+                var filler = Instantiate(groundFloorFillerPrefabs[index], transform.position + direction * i - new Vector3(storyComponents[index].Width / 2, 0,0) + new Vector3(0,-0.297f*i +Height,0), Quaternion.identity, transform);
                 //Once I got the bottom of the filler placing on the top of each component I noticed that the additional y scale neeed to bring them flush is 0.594 which is probably
                 //the output of some trig I was too dumb to figure out at the moment
-                filler.transform.localScale = new Vector3(1,  placed * 0.594f, 1);
+                filler.transform.localScale = new Vector3(1,  placed * (0.297f * storyComponents[index].Width), 1);
             }
             placed++;
+            i += storyComponents[index].Width;
         }
     }
 
