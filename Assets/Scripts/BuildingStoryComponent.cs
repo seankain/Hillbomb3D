@@ -4,7 +4,7 @@ using UnityEngine;
 
 public enum StoryComponentType
 {
-    Wall,Window,Door,Stair,Balcony,Roof
+    Wall,Window,Door,Stair,Balcony,Roof,Garage
 }
 public class BuildingStoryComponent : MonoBehaviour
 {

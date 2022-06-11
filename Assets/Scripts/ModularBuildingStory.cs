@@ -28,7 +28,16 @@ public class ModularBuildingStory : MonoBehaviour
         for (var i = 0; i < storyPrefabs.Length; i++)
         {
             storyComponents[i] = storyPrefabs[i].GetComponent<BuildingStoryComponent>();
-            selectionProbability[i] = 1 / storyPrefabs.Length;
+            selectionProbability[i] = 1f / (float)storyPrefabs.Length;
+        }
+        GenerateGroundFloor();
+    }
+
+    public void Render()
+    {
+        for(var i = prefabInstances.Count-1;i>=0;i--)
+        {
+            Destroy(prefabInstances[i]);
         }
         GenerateGroundFloor();
     }
@@ -43,18 +52,23 @@ public class ModularBuildingStory : MonoBehaviour
         }
         float i = 0;
         int placed = 0;
+        float prevWidth = 0;
         while (i < Width)
         {
             var index = GetNextComponent(Width - i, Height);
             // wanted to use sin(17) since the angle of the level is fixed at 17 degrees but messed around to get 0.297 instead
             var pos = transform.position + direction * i - (new Vector3(0, 0.297f * i, 0));
-            Instantiate(storyPrefabs[index], transform.position + (direction * i - new Vector3((storyComponents[index].Width/2),0,0)) - (new Vector3(0,0.297f*i,0)),Quaternion.identity,transform);
-            if (i > storyComponents[index].Width)
+            prefabInstances.Add(Instantiate(storyPrefabs[index], transform.position + (direction * i - new Vector3((storyComponents[index].Width/2),0,0)) - (new Vector3(0,0.297f*i,0)),Quaternion.identity,transform));
+            //if (i > storyComponents[index].Width)
+            prevWidth = storyComponents[index].Width;
+            if(placed > 0)
             {
                 var filler = Instantiate(groundFloorFillerPrefabs[index], transform.position + direction * i - new Vector3(storyComponents[index].Width / 2, 0,0) + new Vector3(0,-0.297f*i +Height,0), Quaternion.identity, transform);
                 //Once I got the bottom of the filler placing on the top of each component I noticed that the additional y scale neeed to bring them flush is 0.594 which is probably
                 //the output of some trig I was too dumb to figure out at the moment
-                filler.transform.localScale = new Vector3(1,  placed * (0.297f * storyComponents[index].Width), 1);
+                //filler.transform.localScale = new Vector3(1,  placed * (0.297f * storyComponents[index].Width), 1);
+                filler.transform.localScale = new Vector3(1, (0.297f * i), 1);
+                prefabInstances.Add(filler);
             }
             placed++;
             i += storyComponents[index].Width;
