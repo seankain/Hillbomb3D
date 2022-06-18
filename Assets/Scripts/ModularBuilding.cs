@@ -7,6 +7,8 @@ public class ModularBuilding : MonoBehaviour
     public GameObject GroundFloor;
     public GameObject StoryRoot;
     public List<GameObject> StoryPrefabs;
+    public GameObject GroundFloorPrefab;
+    public GameObject RoofPrefab;
     public GameObject Roof;
     public List<GameObject> Stories;
     public int StoryCount = 2;
@@ -37,9 +39,14 @@ public class ModularBuilding : MonoBehaviour
                 currentHeight = s.transform.position.y;
             }
         }
-        var nextStoryPosition = StoryRoot.transform.position + new Vector3(0, StoryHeight * Stories.Count + 1, 0);
+        //var nextStoryPosition = StoryRoot.transform.position + new Vector3(0, StoryHeight * Stories.Count + 1, 0);
+        var nextStoryPosition = StoryRoot.transform.position + new Vector3(0, StoryHeight * Stories.Count, 0);
         //TODO random select
         var prefab = Instantiate(StoryPrefabs[0], nextStoryPosition,Quaternion.identity,StoryRoot.transform);
+        Debug.Log("getting modular building component");
+        var story = prefab.GetComponent<ModularBuildingStory>();
+        story.StoryIndex = Stories.Count + 1;
+        story.Render();
         Stories.Add(prefab);
         Roof.transform.position = new Vector3(Roof.transform.position.x, prefab.transform.position.y + (StoryHeight * 0.5f),Roof.transform.position.z);
            
@@ -49,9 +56,18 @@ public class ModularBuilding : MonoBehaviour
     void Start()
     {
         Stories = new List<GameObject>();
-        for (var i = 0; i < StoryRoot.transform.childCount; i++)
+        GroundFloor = Instantiate(GroundFloorPrefab,gameObject.transform);
+        GroundFloor.GetComponent<ModularBuildingStory>().Render();
+        Stories.Add(GroundFloor);
+        Roof = Instantiate(RoofPrefab,gameObject.transform);
+        Roof.transform.position = new Vector3(Roof.transform.position.x, GroundFloor.transform.position.y + (StoryHeight * 0.5f), Roof.transform.position.z);
+        var roof = Roof.GetComponent<ModularBuildingStory>();
+        roof.StoryIndex = StoryCount;
+        roof.Render();
+        for (var i = 1; i < StoryRoot.transform.childCount; i++)
         {
-            Stories.Add(StoryRoot.transform.GetChild(i).gameObject);
+            AddStory();
+            //Stories.Add(StoryRoot.transform.GetChild(i).gameObject);
         }
 
     }
