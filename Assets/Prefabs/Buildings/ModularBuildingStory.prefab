@@ -148,7 +148,11 @@ MonoBehaviour:
   StoryIndex: 0
   storyPrefabs:
   - {fileID: 130021244662579469, guid: 579036d2aa2eaa24090a3f190161fb76, type: 3}
+  - {fileID: 290038799189666983, guid: cfe1fa18099c8a04191c5f30837708f0, type: 3}
+  - {fileID: 8716833051648118912, guid: 8b8726cf4cf0760419add6a8630e3725, type: 3}
   groundFloorFillerPrefabs:
+  - {fileID: 2895560243389468250, guid: 5e657cc1c049ad44a91ee13d48f66e1d, type: 3}
+  - {fileID: 2895560243389468250, guid: 5e657cc1c049ad44a91ee13d48f66e1d, type: 3}
   - {fileID: 2895560243389468250, guid: 5e657cc1c049ad44a91ee13d48f66e1d, type: 3}
   spawnRules:
   - ComponentType: 0

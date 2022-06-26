@@ -25,6 +25,15 @@ public class ModularBuilding : MonoBehaviour
             PopStory();
         }
     }
+
+    public void Render()
+    {
+        for(var i = 0; i < Stories.Count; i++)
+        {
+            Stories[i].GetComponent<ModularBuildingStory>().Render();
+        }
+    }
+
     private void PopStory()
     {
 
@@ -48,9 +57,10 @@ public class ModularBuilding : MonoBehaviour
         story.StoryIndex = Stories.Count + 1;
         story.Render();
         Stories.Add(prefab);
-        Roof.transform.position = new Vector3(Roof.transform.position.x, prefab.transform.position.y + (StoryHeight * 0.5f),Roof.transform.position.z);
+        Roof.transform.position = new Vector3(Roof.transform.position.x, prefab.transform.position.y + StoryHeight,Roof.transform.position.z);
            
     }
+
 
     // Start is called before the first frame update
     void Start()

@@ -8,7 +8,7 @@ public class DebugModularBuilding : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        story = GetComponent<ModularBuilding>();
+        building = GetComponent<ModularBuilding>();
     }
 
     // Update is called once per frame
@@ -16,7 +16,7 @@ public class DebugModularBuilding : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            story.Render();
+            building.Render();
         }
     }
 }
