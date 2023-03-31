@@ -30,6 +30,7 @@ public class BoardController : BoardControllerBase
     public float MaxLeanY = 10f;
     public Animator SkateboardAnimator;
     public float SpeedWobbleCoefficient = 0.1f;
+    public float bailMagnitude = 50f;
 
     [SerializeField]
     private CharacterState characterState;
@@ -265,7 +266,7 @@ public class BoardController : BoardControllerBase
             var speedWobble = new Vector3(Mathf.Sin(Time.realtimeSinceStartup) * SpeedWobbleCoefficient,0,0);
             turnForce += speedWobble;
         }
-        rb.AddForce(turnForce, ForceMode.Force);
+        rb.AddForce(turnForce, ForceMode.VelocityChange);
 
 
         if (pushing)
@@ -286,7 +287,7 @@ public class BoardController : BoardControllerBase
 
     }
 
-    private void Bail()
+    public void Bail()
     {
         characterState.gameObject.transform.parent = null;
 
@@ -319,8 +320,8 @@ public class BoardController : BoardControllerBase
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.collider.gameObject.tag == "RidingSurface") { return; }
-        //Debug.Log($"Player hitting {collision.collider.name} at {collision.relativeVelocity}");
-        if (Mathf.Abs(collision.relativeVelocity.magnitude) > 20)
+        Debug.Log($"Player hitting {collision.collider.name} at {collision.relativeVelocity} with magnitude {collision.relativeVelocity.magnitude} with impulse {collision.impulse}");
+        if (Mathf.Abs(collision.relativeVelocity.magnitude) > bailMagnitude)
         {
             Bail();
         }
