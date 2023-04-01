@@ -11,7 +11,10 @@ public class CastBoardController : MonoBehaviour
     public Transform FrontAxle;
     public Transform RearAxle;
     private Transform[] wheels;
+    public float SurfaceMatchSmoothing = 5f;
+    public float SmoothDampVelocity = 5f;
     public float PlayerRotateSpeed = 5f;
+    public float AirRotateSpeed = 15f;
     public float MaxTurnAngle = 5f;
     public float TurnSpeed = 1f;
     public float RayGroundDistance = 1f;
@@ -42,6 +45,10 @@ public class CastBoardController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetAxis("Respawn") > 0)
+        {
+            Respawn();
+        }
         horizontal = Input.GetAxis("Horizontal");
         //if(currentTurnAngle < MaxTurnAngle)
         //{
@@ -64,12 +71,34 @@ public class CastBoardController : MonoBehaviour
         {
             if (hitInfo.distance < RayGroundDistance)
             {
-                // gameObject.transform.position = hitInfo.point + new Vector3(0, RayGroundDistance, 0);
+                //TODO smooth these out, also the weird snapping that happens when the character gets a raycast hit but isnt even close to rotated correctly
+                //gameObject.transform.rotation = SmoothDampQuaternion(gameObject.transform.rotation, Quaternion.Euler(hitInfo.normal),ref SmoothDampVelocity,SurfaceMatchSmoothing );
+                //gameObject.transform.rotation = Quaternion.Slerp(gameObject.transform.rotation, Quaternion.Euler(hitInfo.normal),SmoothDampVelocity);
                 gameObject.transform.rotation *= Quaternion.FromToRotation(gameObject.transform.up, hitInfo.normal);
+
                 gameObject.transform.Rotate(Vector3.down, -horizontal * PlayerRotateSpeed * Time.deltaTime);
             }
         }
+        else
+        {
+            //Todo different spin rates for air versus ground
+            gameObject.transform.Rotate(Vector3.down, -horizontal * AirRotateSpeed * Time.deltaTime);
+        }
+
+
     }
+
+    private static Quaternion SmoothDampQuaternion(Quaternion current, Quaternion target, ref float velocity, float smoothTime)
+    {
+        Vector3 c = current.eulerAngles;
+        Vector3 t = target.eulerAngles;
+        return Quaternion.Euler(
+          Mathf.SmoothDampAngle(c.x, t.x, ref velocity, smoothTime),
+          Mathf.SmoothDampAngle(c.y, t.y, ref velocity, smoothTime),
+          Mathf.SmoothDampAngle(c.z, t.z, ref velocity, smoothTime)
+        );
+    }
+
 
     private void AdjustWheelSuspension(Transform wheel, Vector3 wheelWorldVelocity)
     {
@@ -111,6 +140,7 @@ public class CastBoardController : MonoBehaviour
 
     private void AddSteeringForces(Transform wheel)
     {
+        //Credit to Toyful games from their Very Very Valet tutorial
         var ray = new Ray(wheel.position, Vector3.down * CastDistance);
         Debug.DrawRay(wheel.position, Vector3.down * CastDistance, Color.red);
         if (Physics.Raycast(ray, out var hitInfo, CastDistance, ~(1 << LayerMask.NameToLayer("Skateboard"))))
@@ -145,6 +175,24 @@ public class CastBoardController : MonoBehaviour
             Debug.Log(steeringDir * WheelMass * desiredAccel);
             rb.AddForceAtPosition(steeringDir * WheelMass * desiredAccel, wheel.position);
         }
+    }
+
+    private void Respawn()
+    {
+        //Bailed = false;
+        //bailElapsed = 0f;
+        //characterState.Respawn();
+        var respawn = GameObject.FindGameObjectsWithTag("Respawn")[0];
+        //characterState.gameObject.transform.parent = characterParent;
+        //characterState.gameObject.transform.SetPositionAndRotation(Vector3.zero, Quaternion.Euler(0, 90, 0));
+        //characterState.gameObject.transform.SetPositionAndRotation(characterBoardPosition.position, characterBoardPosition.rotation);
+        //PlayerRespawned.Invoke(this, new EventArgs());
+        //OnPlayerRespawned(new EventArgs());
+        this.transform.position = respawn.transform.position;
+        this.transform.rotation = Quaternion.identity;
+        rb.velocity = Vector3.zero;
+
+
     }
 
     private void FixedUpdate()
