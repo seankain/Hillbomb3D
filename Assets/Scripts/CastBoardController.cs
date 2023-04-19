@@ -10,8 +10,10 @@ public class CastBoardController : MonoBehaviour
     public Transform RightRearWheel;
     public Transform FrontAxle;
     public Transform RearAxle;
+    public bool SnapToSurface = true;
     private Transform[] wheels;
-    public float SurfaceMatchSmoothing = 5f;
+    private WheelInfo[] wheelInfos;
+    public float SurfaceMatchSmoothing = 1f;
     public float SmoothDampVelocity = 5f;
     public float PlayerRotateSpeed = 5f;
     public float AirRotateSpeed = 15f;
@@ -27,6 +29,7 @@ public class CastBoardController : MonoBehaviour
     public float WheelMass = 1;
     private Rigidbody rb;
     private float horizontal = 0f;
+    private float vertical = 0f;
     private float currentTurnAngle = 0f;
 
     // Start is called before the first frame update
@@ -40,6 +43,13 @@ public class CastBoardController : MonoBehaviour
             LeftRearWheel,
             RightRearWheel
         };
+        wheelInfos = new WheelInfo[4]
+        {
+            new WheelInfo(LeftFrontWheel),
+            new WheelInfo(RightFrontWheel),
+            new WheelInfo(LeftRearWheel),
+            new WheelInfo(RightRearWheel)
+        };
     }
 
     // Update is called once per frame
@@ -50,10 +60,19 @@ public class CastBoardController : MonoBehaviour
             Respawn();
         }
         horizontal = Input.GetAxis("Horizontal");
+        vertical = Input.GetAxis("Vertical");
         //if(currentTurnAngle < MaxTurnAngle)
         //{
         //TODO fix
         currentTurnAngle += horizontal * TurnSpeed * Time.deltaTime;
+        if(horizontal == 0)
+        {
+            currentTurnAngle -= TurnSpeed * Time.deltaTime;
+            if(!Mathf.Approximately(currentTurnAngle, 0))
+            {
+                currentTurnAngle = 0;
+            }
+        }
         //Debug.Log(currentTurnAngle);
         currentTurnAngle = Mathf.Clamp(currentTurnAngle, -MaxTurnAngle, MaxTurnAngle);
         //LeftFrontWheel.localEulerAngles = new Vector3(0, currentTurnAngle, 0);
@@ -67,25 +86,72 @@ public class CastBoardController : MonoBehaviour
 
         var ray = new Ray(transform.position, Vector3.down);
         Debug.DrawRay(transform.position, Vector3.down, Color.yellow);
+
+        if (SnapToSurface)
+        {
+            foreach (var wheelInfo in wheelInfos)
+            {
+                if (wheelInfo.Hitting)
+                {
+                    transform.rotation = Quaternion.FromToRotation(wheelInfo.WheelTransform.up, wheelInfo.SurfaceNormal) * transform.rotation;
+                    
+                }
+                //transform.rotation = Quaternion.LookRotation(wheelInfo.HitWorldLocation - wheelInfo.WheelTransform.position) * _childRPos;
+            }
+        }
+
         if (Physics.Raycast(ray, out var hitInfo, 1, ~(1 << LayerMask.NameToLayer("Skateboard"))))
         {
             if (hitInfo.distance < RayGroundDistance)
             {
-                //TODO smooth these out, also the weird snapping that happens when the character gets a raycast hit but isnt even close to rotated correctly
-                //gameObject.transform.rotation = SmoothDampQuaternion(gameObject.transform.rotation, Quaternion.Euler(hitInfo.normal),ref SmoothDampVelocity,SurfaceMatchSmoothing );
-                //gameObject.transform.rotation = Quaternion.Slerp(gameObject.transform.rotation, Quaternion.Euler(hitInfo.normal),SmoothDampVelocity);
-                gameObject.transform.rotation *= Quaternion.FromToRotation(gameObject.transform.up, hitInfo.normal);
+                if (SnapToSurface)
+                {
+                    //    //TODO smooth these out, also the weird snapping that happens when the character gets a raycast hit but isnt even close to rotated correctly
+                    //    //gameObject.transform.rotation = SmoothDampQuaternion(gameObject.transform.rotation, Quaternion.Euler(hitInfo.normal),ref SmoothDampVelocity,SurfaceMatchSmoothing );
+                    //    //gameObject.transform.rotation = Quaternion.Slerp(gameObject.transform.rotation, Quaternion.Euler(hitInfo.normal),SmoothDampVelocity);
+                    //    //-------------------
+                    //    //var n = new Vector3(hitInfo.normal.x, transform.rotation.eulerAngles.y, hitInfo.normal.z);
+                    //    //gameObject.transform.rotation *= Quaternion.FromToRotation(gameObject.transform.up, n);
+                    //    //gameObject.transform.Rotate(Vector3.down, -horizontal * PlayerRotateSpeed * Time.deltaTime);
+                    //    //This is finnicky still and has some problems compared to the single raycast from the middle
+                    //    foreach (var wheelInfo in wheelInfos)
+                    //    {
+                    //        if (wheelInfo.Hitting)
+                    //        {
+                    //            transform.rotation = Quaternion.FromToRotation(wheelInfo.WheelTransform.up, wheelInfo.SurfaceNormal) * transform.rotation;
+                    //        }
+                    //        //transform.rotation = Quaternion.LookRotation(wheelInfo.HitWorldLocation - wheelInfo.WheelTransform.position) * _childRPos;
+                    //    }
 
-                gameObject.transform.Rotate(Vector3.down, -horizontal * PlayerRotateSpeed * Time.deltaTime);
+                    //This works for the single central raycast but its too jerky and unresponsive to small terrain changes or slopes
+                    //uncomment the aligning with surface normal to use
+                    float headingDeltaAngle = Input.GetAxis("Horizontal") * Time.deltaTime * TurnSpeed;
+                    Quaternion headingDelta = Quaternion.AngleAxis(headingDeltaAngle, transform.up);
+                    //align with surface normal
+                    //transform.rotation = Quaternion.FromToRotation(transform.up, hitInfo.normal) * transform.rotation;
+                    //apply heading rotation
+                    transform.rotation = headingDelta * transform.rotation;
+                }
             }
+
         }
         else
         {
-            //Todo different spin rates for air versus ground
-            gameObject.transform.Rotate(Vector3.down, -horizontal * AirRotateSpeed * Time.deltaTime);
+            rb.AddTorque(-transform.up * (-horizontal * AirRotateSpeed * Time.deltaTime));
+            //gameObject.transform.Rotate(Vector3.down, -horizontal * AirRotateSpeed * Time.deltaTime);
+            //gameObject.transform.Rotate(Vector3.right, vertical * AirRotateSpeed * Time.deltaTime);
+            rb.AddTorque(transform.right * (vertical * AirRotateSpeed * Time.deltaTime));
         }
 
 
+    }
+
+
+    private static Quaternion SmoothSlerp(Transform current, Vector3 goalPosition,float speed)
+    {
+        var direction = (goalPosition - current.position).normalized;
+        var goal = Quaternion.LookRotation(direction);
+        return Quaternion.Slerp(current.rotation,goal,speed);
     }
 
     private static Quaternion SmoothDampQuaternion(Quaternion current, Quaternion target, ref float velocity, float smoothTime)
@@ -138,13 +204,17 @@ public class CastBoardController : MonoBehaviour
         rb.AddForceAtPosition(steeringDir * WheelMass * desiredAccel, wheel.position);
     }
 
-    private void AddSteeringForces(Transform wheel)
+    private void AddSteeringForces(WheelInfo wheelInfo)
     {
+        var wheel = wheelInfo.WheelTransform;
         //Credit to Toyful games from their Very Very Valet tutorial
         var ray = new Ray(wheel.position, Vector3.down * CastDistance);
         Debug.DrawRay(wheel.position, Vector3.down * CastDistance, Color.red);
         if (Physics.Raycast(ray, out var hitInfo, CastDistance, ~(1 << LayerMask.NameToLayer("Skateboard"))))
         {
+            wheelInfo.SurfaceNormal = hitInfo.normal;
+            wheelInfo.Hitting = true;
+            wheelInfo.HitWorldLocation = hitInfo.point;
             //Spring
             Vector3 wheelWorldVel = rb.GetPointVelocity(wheel.position);
             //Credit to Toyful games from their Very Very Valet tutorial
@@ -175,6 +245,10 @@ public class CastBoardController : MonoBehaviour
             Debug.Log(steeringDir * WheelMass * desiredAccel);
             rb.AddForceAtPosition(steeringDir * WheelMass * desiredAccel, wheel.position);
         }
+        else
+        {
+            wheelInfo.Hitting = false;
+        }
     }
 
     private void Respawn()
@@ -183,6 +257,8 @@ public class CastBoardController : MonoBehaviour
         //bailElapsed = 0f;
         //characterState.Respawn();
         var respawn = GameObject.FindGameObjectsWithTag("Respawn")[0];
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
         //characterState.gameObject.transform.parent = characterParent;
         //characterState.gameObject.transform.SetPositionAndRotation(Vector3.zero, Quaternion.Euler(0, 90, 0));
         //characterState.gameObject.transform.SetPositionAndRotation(characterBoardPosition.position, characterBoardPosition.rotation);
@@ -197,10 +273,14 @@ public class CastBoardController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        foreach (var wheel in wheels)
+        foreach (var wheelInfo in wheelInfos)
         {
-            AddSteeringForces(wheel);
+            AddSteeringForces(wheelInfo);
         }
+        //foreach (var wheel in wheels)
+        //{
+        //    AddSteeringForces(wheel);
+        //}
     }
 }
 
@@ -215,4 +295,16 @@ public class WheelSuspensionSpring
         return (Offset * Strength) - (velocity * Damping);
     }
 
+}
+
+public class WheelInfo
+{
+    public WheelInfo(Transform wheelTransform)
+    {
+        this.WheelTransform = wheelTransform;
+    }
+    public Transform WheelTransform;
+    public bool Hitting = false;
+    public Vector3 SurfaceNormal;
+    public Vector3 HitWorldLocation;
 }
