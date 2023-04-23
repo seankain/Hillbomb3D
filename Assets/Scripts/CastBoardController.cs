@@ -11,6 +11,9 @@ public class CastBoardController : MonoBehaviour
     public Transform FrontAxle;
     public Transform RearAxle;
     public bool SnapToSurface = true;
+    public float UprightStability = 0.3f;
+    public float UprightSpeed = 2.0f;
+    public bool UprightSingleAxis = false;
     private Transform[] wheels;
     private WheelInfo[] wheelInfos;
     public float SurfaceMatchSmoothing = 1f;
@@ -31,6 +34,7 @@ public class CastBoardController : MonoBehaviour
     private float horizontal = 0f;
     private float vertical = 0f;
     private float currentTurnAngle = 0f;
+    private bool Grounded = false;
 
     // Start is called before the first frame update
     void Start()
@@ -50,6 +54,14 @@ public class CastBoardController : MonoBehaviour
             new WheelInfo(LeftRearWheel),
             new WheelInfo(RightRearWheel)
         };
+        // Turning the colliders on messed with the inertia tensors and center of mass so manually setting them
+        // until i can figure out a way to do it correctly
+        rb.inertiaTensor = new Vector3(11.78971f, 12.80615f, 1.080781f);
+        rb.inertiaTensorRotation = Quaternion.Euler(0, 0, 359.9538f);
+        rb.centerOfMass = new Vector3(0, -0.0900267f, 0.03401519f);
+        //GetComponent<BoxCollider>().enabled = true;
+        //GetComponent<CapsuleCollider>().enabled = true;
+        //rb.ResetInertiaTensor();
     }
 
     // Update is called once per frame
@@ -73,15 +85,18 @@ public class CastBoardController : MonoBehaviour
                 currentTurnAngle = 0;
             }
         }
-        //Debug.Log(currentTurnAngle);
         currentTurnAngle = Mathf.Clamp(currentTurnAngle, -MaxTurnAngle, MaxTurnAngle);
-        //LeftFrontWheel.localEulerAngles = new Vector3(0, currentTurnAngle, 0);
-        //RightFrontWheel.localEulerAngles = new Vector3(0, currentTurnAngle, 0);
-        //LeftRearWheel.localEulerAngles = new Vector3(0, -currentTurnAngle, 0);
-        //RightRearWheel.localEulerAngles = new Vector3(0, -currentTurnAngle, 0);
-
-        FrontAxle.localEulerAngles = new Vector3(0, currentTurnAngle, 0);
-        //RearAxle.localEulerAngles = new Vector3(0, -currentTurnAngle, 0);
+        Debug.Log(Vector3.Dot(transform.forward, Vector3.up));
+        if (Vector3.Dot(transform.forward,Vector3.up) <= 0)
+        {
+            FrontAxle.localEulerAngles = new Vector3(0, currentTurnAngle, 0);
+            RearAxle.localEulerAngles = new Vector3(0, -currentTurnAngle, 0);
+        }
+        else
+        {
+            FrontAxle.localEulerAngles = new Vector3(0, -currentTurnAngle, 0);
+            RearAxle.localEulerAngles = new Vector3(0, currentTurnAngle, 0);
+        }
         //}
 
         var ray = new Ray(transform.position, Vector3.down);
@@ -94,7 +109,6 @@ public class CastBoardController : MonoBehaviour
                 if (wheelInfo.Hitting)
                 {
                     transform.rotation = Quaternion.FromToRotation(wheelInfo.WheelTransform.up, wheelInfo.SurfaceNormal) * transform.rotation;
-                    
                 }
                 //transform.rotation = Quaternion.LookRotation(wheelInfo.HitWorldLocation - wheelInfo.WheelTransform.position) * _childRPos;
             }
@@ -104,6 +118,7 @@ public class CastBoardController : MonoBehaviour
         {
             if (hitInfo.distance < RayGroundDistance)
             {
+                Grounded = true;
                 if (SnapToSurface)
                 {
                     //    //TODO smooth these out, also the weird snapping that happens when the character gets a raycast hit but isnt even close to rotated correctly
@@ -137,10 +152,11 @@ public class CastBoardController : MonoBehaviour
         }
         else
         {
-            rb.AddTorque(-transform.up * (-horizontal * AirRotateSpeed * Time.deltaTime));
+            Grounded = false;
+            //rb.AddTorque(-transform.up * (-horizontal * AirRotateSpeed * Time.deltaTime));
             //gameObject.transform.Rotate(Vector3.down, -horizontal * AirRotateSpeed * Time.deltaTime);
             //gameObject.transform.Rotate(Vector3.right, vertical * AirRotateSpeed * Time.deltaTime);
-            rb.AddTorque(transform.right * (vertical * AirRotateSpeed * Time.deltaTime));
+           //rb.AddTorque(transform.right * (vertical * AirRotateSpeed * Time.deltaTime));
         }
 
 
@@ -242,7 +258,6 @@ public class CastBoardController : MonoBehaviour
             //turn change in velocity into an acceleration
             //this will produce the acceleration necessary to change the velocity by desiredVelChange in 1 physics step
             float desiredAccel = desiredVelChange / Time.fixedDeltaTime;
-            Debug.Log(steeringDir * WheelMass * desiredAccel);
             rb.AddForceAtPosition(steeringDir * WheelMass * desiredAccel, wheel.position);
         }
         else
@@ -277,6 +292,20 @@ public class CastBoardController : MonoBehaviour
         {
             AddSteeringForces(wheelInfo);
         }
+        if (!Grounded)
+        {
+            rb.AddTorque(-transform.up * (-horizontal * AirRotateSpeed * Time.fixedDeltaTime));
+            rb.AddTorque(transform.right * (vertical * AirRotateSpeed * Time.fixedDeltaTime));
+        }
+        //trying to find a way to stop wacky flipping without locking rigidbody
+        //https://answers.unity.com/questions/10425/how-to-stabilize-angular-motion-alignment-of-hover.html
+        var predictedUp = Quaternion.AngleAxis(rb.angularVelocity.magnitude * Mathf.Rad2Deg * UprightStability / UprightSpeed, rb.angularVelocity) * transform.up;
+        var torqueVector = Vector3.Cross(predictedUp, Vector3.up);
+        if (UprightSingleAxis)
+        {
+            Vector3.Project(torqueVector,transform.forward);
+        }
+        rb.AddTorque(torqueVector * UprightSpeed * UprightSpeed);
         //foreach (var wheel in wheels)
         //{
         //    AddSteeringForces(wheel);

@@ -11875,7 +11875,7 @@ MonoBehaviour:
   Damping: 30
   Strength: 100
   Offset: 0.1
-  WheelGripFactor: 0.9
+  WheelGripFactor: 0.94
   WheelMass: 1
 --- !u!65 &676234432
 BoxCollider:
