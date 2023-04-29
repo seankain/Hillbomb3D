@@ -10,6 +10,7 @@ TagManager:
   - Kill
   - ChunkStart
   - ChunkEnd
+  - Grindable
   layers:
   - Default
   - TransparentFX

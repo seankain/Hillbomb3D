@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CastBoardController : MonoBehaviour
+public class CastBoardController : BoardControllerBase
 {
     public Transform LeftFrontWheel;
     public Transform RightFrontWheel;
@@ -14,8 +14,8 @@ public class CastBoardController : MonoBehaviour
     public float UprightStability = 0.3f;
     public float UprightSpeed = 2.0f;
     public bool UprightSingleAxis = false;
-    private Transform[] wheels;
     private WheelInfo[] wheelInfos;
+    public Vector3 OlliePopForce = new Vector3(0, 1000, 0);
     public float SurfaceMatchSmoothing = 1f;
     public float SmoothDampVelocity = 5f;
     public float PlayerRotateSpeed = 5f;
@@ -35,18 +35,20 @@ public class CastBoardController : MonoBehaviour
     private float vertical = 0f;
     private float currentTurnAngle = 0f;
     private bool Grounded = false;
+    //TODO consider making separate monobehavior theres too much in here
+    private bool isGrinding = false;
+    private Grindable currentGrindingSurface = null;
+    private Vector3 GrindVelocity = Vector3.zero;
+    private bool isJumping;
 
-    // Start is called before the first frame update
+    [SerializeField]
+    private CharacterState characterState;
+    [SerializeField]
+    private Animator SkateboardAnimator;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        wheels = new Transform[4]
-        {
-            LeftFrontWheel,
-            RightFrontWheel,
-            LeftRearWheel,
-            RightRearWheel
-        };
         wheelInfos = new WheelInfo[4]
         {
             new WheelInfo(LeftFrontWheel),
@@ -73,21 +75,43 @@ public class CastBoardController : MonoBehaviour
         }
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
-        //if(currentTurnAngle < MaxTurnAngle)
-        //{
-        //TODO fix
+        isJumping = Input.GetButtonDown("Jump");
+        if (isGrinding)
+        {
+            //forces handled in fixed update
+            //handle grinding inputs separately from normal riding
+            //if (currentGrindingSurface.TryGetNextWaypoint(transform.position, out Transform nextGrindPosition))
+            //{
+            //    rb.velocity = Vector3.MoveTowards(transform.position, nextGrindPosition.position, GrindVelocity.z * Time.deltaTime);
+            //}
+            //if (isJumping)
+            //{
+            //    isGrinding = false;
+            //    currentGrindingSurface = null;
+            //    Ollie();
+            //}
+            //else
+            //{
+            //    return;
+            //}
+        }
+        if (isJumping && Grounded)
+        {
+            Ollie();
+            return;
+        }
         currentTurnAngle += horizontal * TurnSpeed * Time.deltaTime;
-        if(horizontal == 0)
+        if (horizontal == 0)
         {
             currentTurnAngle -= TurnSpeed * Time.deltaTime;
-            if(!Mathf.Approximately(currentTurnAngle, 0))
+            if (!Mathf.Approximately(currentTurnAngle, 0))
             {
                 currentTurnAngle = 0;
             }
         }
         currentTurnAngle = Mathf.Clamp(currentTurnAngle, -MaxTurnAngle, MaxTurnAngle);
-        Debug.Log(Vector3.Dot(transform.forward, Vector3.up));
-        if (Vector3.Dot(transform.forward,Vector3.up) <= 0)
+        //Debug.Log(Vector3.Dot(transform.forward, Vector3.up));
+        if (Vector3.Dot(transform.forward, Vector3.up) <= 0)
         {
             FrontAxle.localEulerAngles = new Vector3(0, currentTurnAngle, 0);
             RearAxle.localEulerAngles = new Vector3(0, -currentTurnAngle, 0);
@@ -97,7 +121,6 @@ public class CastBoardController : MonoBehaviour
             FrontAxle.localEulerAngles = new Vector3(0, -currentTurnAngle, 0);
             RearAxle.localEulerAngles = new Vector3(0, currentTurnAngle, 0);
         }
-        //}
 
         var ray = new Ray(transform.position, Vector3.down);
         Debug.DrawRay(transform.position, Vector3.down, Color.yellow);
@@ -110,7 +133,6 @@ public class CastBoardController : MonoBehaviour
                 {
                     transform.rotation = Quaternion.FromToRotation(wheelInfo.WheelTransform.up, wheelInfo.SurfaceNormal) * transform.rotation;
                 }
-                //transform.rotation = Quaternion.LookRotation(wheelInfo.HitWorldLocation - wheelInfo.WheelTransform.position) * _childRPos;
             }
         }
 
@@ -156,18 +178,18 @@ public class CastBoardController : MonoBehaviour
             //rb.AddTorque(-transform.up * (-horizontal * AirRotateSpeed * Time.deltaTime));
             //gameObject.transform.Rotate(Vector3.down, -horizontal * AirRotateSpeed * Time.deltaTime);
             //gameObject.transform.Rotate(Vector3.right, vertical * AirRotateSpeed * Time.deltaTime);
-           //rb.AddTorque(transform.right * (vertical * AirRotateSpeed * Time.deltaTime));
+            //rb.AddTorque(transform.right * (vertical * AirRotateSpeed * Time.deltaTime));
         }
 
 
     }
 
 
-    private static Quaternion SmoothSlerp(Transform current, Vector3 goalPosition,float speed)
+    private static Quaternion SmoothSlerp(Transform current, Vector3 goalPosition, float speed)
     {
         var direction = (goalPosition - current.position).normalized;
         var goal = Quaternion.LookRotation(direction);
-        return Quaternion.Slerp(current.rotation,goal,speed);
+        return Quaternion.Slerp(current.rotation, goal, speed);
     }
 
     private static Quaternion SmoothDampQuaternion(Quaternion current, Quaternion target, ref float velocity, float smoothTime)
@@ -266,6 +288,45 @@ public class CastBoardController : MonoBehaviour
         }
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "Grindable")
+        {
+            Debug.Log("Grinding");
+            GrindVelocity = new Vector3(0, 0, rb.velocity.z);
+            currentGrindingSurface = collision.gameObject.GetComponent<Grindable>();
+            transform.position = currentGrindingSurface.GetInitPosition(collision.contacts[0].point);
+            //rb.velocity = new Vector3(0, 0, 0);
+            isGrinding = true;
+        }
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        if (collision.gameObject.tag == "Grindable")
+        {
+            Debug.Log(gameObject.name);
+
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.tag == "Grindable")
+        {
+            Debug.Log("Stop grinding");
+            isGrinding = false;
+            currentGrindingSurface = null;
+        }
+    }
+
+    private void Ollie()
+    {
+        characterState.Ollie();
+        SkateboardAnimator.SetTrigger("Ollie");
+        rb.AddForce(OlliePopForce);
+    }
+
     private void Respawn()
     {
         //Bailed = false;
@@ -288,6 +349,24 @@ public class CastBoardController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (isGrinding)
+        {
+            if (currentGrindingSurface.TryGetNextWaypoint(transform.position, out Transform nextGrindPosition))
+            {
+                rb.AddForce(Vector3.MoveTowards(transform.position, nextGrindPosition.position, GrindVelocity.z * Time.fixedDeltaTime));
+            }
+            if (isJumping)
+            {
+                isGrinding = false;
+                currentGrindingSurface = null;
+                Ollie();
+            }
+            else
+            {
+                return;
+            }
+            return;
+        }
         foreach (var wheelInfo in wheelInfos)
         {
             AddSteeringForces(wheelInfo);
@@ -303,7 +382,7 @@ public class CastBoardController : MonoBehaviour
         var torqueVector = Vector3.Cross(predictedUp, Vector3.up);
         if (UprightSingleAxis)
         {
-            Vector3.Project(torqueVector,transform.forward);
+            Vector3.Project(torqueVector, transform.forward);
         }
         rb.AddTorque(torqueVector * UprightSpeed * UprightSpeed);
         //foreach (var wheel in wheels)
