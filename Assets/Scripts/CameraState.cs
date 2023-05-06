@@ -5,7 +5,7 @@ using UnityEngine;
 public class CameraState : MonoBehaviour
 {
 
-    public BoardController boardController;
+    public BoardControllerBase boardController;
 
     public CharacterState characterState;
     public ChaseCamera chaseCamera;
